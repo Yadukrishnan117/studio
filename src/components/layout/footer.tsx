@@ -1,4 +1,6 @@
-import { Building2, Github, Twitter, Linkedin } from 'lucide-react'
+
+import Image from 'next/image'
+import { Github, Twitter, Linkedin } from 'lucide-react'
 import Link from 'next/link'
 
 export function Footer() {
@@ -8,7 +10,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="flex flex-col space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <Building2 className="h-8 w-8 text-primary" />
+              <Image src="/logo.png" alt="Zeleste Logo" width={32} height={32} className="h-8 w-8" />
               <span className="font-bold text-lg text-primary font-headline tracking-wider">ZELESTE</span>
             </Link>
             <p className="text-sm">
