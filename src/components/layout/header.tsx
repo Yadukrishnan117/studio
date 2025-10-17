@@ -23,7 +23,7 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Zeleste Logo" width={32} height={32} className="h-8 w-8" />
+            <Image src="/logo.png" alt="Zeleste Logo" width={40} height={40} className="h-10 w-10" />
             <div className="flex flex-col">
               <span className="font-bold text-lg text-primary font-headline tracking-wider">ZELESTE</span>
               <span className="text-xs text-muted-foreground -mt-1">ENGINEERS &amp; CONTRACTORS</span>
@@ -51,9 +51,8 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[240px]">
               <div className="flex flex-col p-6">
-                <Link href="/" className="mb-8 flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-                  <Image src="/logo.png" alt="Zeleste Logo" width={32} height={32} className="h-8 w-8" />
-                   <span className="font-bold text-primary font-headline">ZELESTE</span>
+                <Link href="/" className="mb-8 flex items-center" onClick={() => setIsOpen(false)}>
+                  <Image src="/logo.png" alt="Zeleste Logo" width={40} height={40} className="h-10 w-10" />
                 </Link>
                 <nav className="flex flex-col space-y-4">
                   {navLinks.map((link) => (
