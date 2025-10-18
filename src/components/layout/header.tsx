@@ -12,7 +12,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/services', label: 'Services' },
-  { href: '/#news', label: 'News' },
+  { href: '/news', label: 'News' },
   { href: '/contact', label: 'Contact Us' },
 ]
 
