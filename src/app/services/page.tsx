@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import type { LucideIcon } from "lucide-react";
-import { Wrench, HardHat, DraftingCompass, ClipboardList, Lightbulb, Users } from 'lucide-react';
+import { Zap, CircuitBoard, HardHat, FileText, Wrench } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
@@ -13,34 +12,29 @@ type Service = {
 
 const services: Service[] = [
   {
+    icon: Zap,
+    title: 'EV Charger Installation',
+    description: 'Complete setup of AC and DC fast chargers at fuel stations, commercial spaces, and public locations.',
+  },
+  {
+    icon: CircuitBoard,
+    title: 'Electrical & Panel Works',
+    description: 'Supply and installation of panels, cables, earthing systems, and load management equipment.',
+  },
+  {
     icon: HardHat,
-    title: 'Civil Engineering',
-    description: 'Comprehensive design and supervision for infrastructure projects, including roads, bridges, and public works.',
+    title: 'Site Development & Civil Works',
+    description: 'Foundation construction, canopy setup, and charger room fabrication as per standards.',
+  },
+  {
+    icon: FileText,
+    title: 'KSEB Liaisoning & Approvals',
+    description: 'Assistance with electrical inspections, permits, and power connection formalities.',
   },
   {
     icon: Wrench,
-    title: 'General Contracting',
-    description: 'Full-service contracting for commercial and residential projects, ensuring quality and timely completion.',
-  },
-  {
-    icon: DraftingCompass,
-    title: 'Architectural Design',
-    description: 'Innovative and functional design solutions that blend aesthetics with structural integrity and sustainability.',
-  },
-  {
-    icon: ClipboardList,
-    title: 'Project Management',
-    description: 'Expert oversight from conception to completion, managing budgets, schedules, and resources effectively.',
-  },
-  {
-    icon: Lightbulb,
-    title: 'Consulting Services',
-    description: 'Providing strategic advice and technical expertise to help clients navigate complex engineering challenges.',
-  },
-  {
-    icon: Users,
-    title: 'Feasibility Studies',
-    description: 'In-depth analysis of project viability, covering technical, economic, and legal aspects to ensure success.',
+    title: 'Maintenance & Support',
+    description: 'Routine inspection, troubleshooting, and performance optimization for installed chargers.',
   },
 ];
 
@@ -61,9 +55,9 @@ export default function ServicesPage() {
         )}
         <div className="absolute inset-0 bg-black/60" />
         <div className="container relative text-center text-white">
-          <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">Our Programs &amp; Services</h1>
-          <p className="max-w-2xl mx-auto mt-4 text-lg md:text-xl">
-            Delivering excellence across a wide spectrum of engineering and construction disciplines.
+          <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">Our Services</h1>
+          <p className="max-w-3xl mx-auto mt-4 text-lg md:text-xl">
+            We offer a complete range of services focused on EV charging infrastructure development.
           </p>
         </div>
       </section>
@@ -84,6 +78,11 @@ export default function ServicesPage() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+          <div className="max-w-3xl mx-auto text-center mt-16">
+            <p className="text-lg text-foreground">
+                Our turnkey approach ensures smooth execution — from planning to power-on — across urban and rural locations in India.
+            </p>
           </div>
         </div>
       </section>
