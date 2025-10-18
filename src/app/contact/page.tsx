@@ -1,5 +1,5 @@
 import { ContactForm } from "@/components/contact-form";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Globe } from "lucide-react";
 
 export default function ContactPage() {
   return (
@@ -24,8 +24,8 @@ export default function ContactPage() {
                   <MapPin className="h-6 w-6 text-accent-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold">Address</h3>
-                  <p className="text-muted-foreground">123 Engineering Lane, Tech City, 12345</p>
+                  <h3 className="text-xl font-semibold">Headquarters</h3>
+                  <p className="text-muted-foreground">Venchavode Lane, Gandhipuram, Chavadimukku, Sreekariyam, Thiruvananthapuram, Kerala – 695017</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
@@ -34,7 +34,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold">Phone</h3>
-                  <p className="text-muted-foreground">+1 (555) 123-4567</p>
+                  <p className="text-muted-foreground">+91 7306150822</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
@@ -43,7 +43,20 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold">Email</h3>
-                  <p className="text-muted-foreground">contact@zeleste.co</p>
+                  <p className="text-muted-foreground">eczeleste@gmail.com</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-4">
+                <div className="bg-accent rounded-full p-3 mt-1">
+                  <Globe className="h-6 w-6 text-accent-foreground" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">Website</h3>
+                  <p className="text-muted-foreground">
+                    <a href="http://www.zeleste.in" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                      www.zeleste.in
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>

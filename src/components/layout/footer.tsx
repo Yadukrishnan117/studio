@@ -1,6 +1,6 @@
 
 import Image from 'next/image'
-import { Github, Twitter, Linkedin } from 'lucide-react'
+import { Github, Twitter, Linkedin, Globe } from 'lucide-react'
 import Link from 'next/link'
 
 export function Footer() {
@@ -29,14 +29,17 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4 text-primary font-headline">Contact</h3>
             <ul className="space-y-2 text-sm">
-              <li>contact@zeleste.co</li>
-              <li>+1 (555) 123-4567</li>
-              <li>123 Engineering Lane, Tech City, 12345</li>
+              <li>eczeleste@gmail.com</li>
+              <li>+91 7306150822</li>
+              <li>Venchavode Lane, Gandhipuram, Sreekariyam, Thiruvananthapuram, Kerala – 695017</li>
             </ul>
           </div>
           <div>
             <h3 className="font-semibold mb-4 text-primary font-headline">Follow Us</h3>
             <div className="flex space-x-4">
+              <Link href="http://www.zeleste.in" target="_blank" rel="noopener noreferrer" aria-label="Website">
+                <Globe className="h-6 w-6 hover:text-primary transition-colors" />
+              </Link>
               <Link href="#" aria-label="Twitter">
                 <Twitter className="h-6 w-6 hover:text-primary transition-colors" />
               </Link>
