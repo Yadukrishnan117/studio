@@ -3,38 +3,44 @@
     {
       "id": "hero-main",
       "description": "A modern architectural building at dusk.",
-      "imageUrl": "https://picsum.photos/seed/hero/1920/1080",
+      "imageUrl": "https://images.unsplash.com/photo-1671782304514-b81260f5f2c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhcmNoaXRlY3R1cmUlMjBidWlsZGluZ3xlbnwwfHx8fDE3NjA3NTU1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "architecture building"
     },
     {
       "id": "team-1",
       "description": "Portrait of a female engineer.",
-      "imageUrl": "https://picsum.photos/seed/team1/400/400",
+      "imageUrl": "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2MDczMDk0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "woman portrait"
     },
     {
       "id": "team-2",
       "description": "Portrait of a male contractor.",
-      "imageUrl": "https://picsum.photos/seed/team2/400/400",
+      "imageUrl": "https://images.unsplash.com/photo-1583195763986-0231686dcd43?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjA3MzA5NDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "man portrait"
     },
     {
       "id": "team-3",
       "description": "Portrait of a female project manager.",
-      "imageUrl": "https://picsum.photos/seed/team3/400/400",
+      "imageUrl": "https://images.unsplash.com/photo-1600275669439-14e40452d20b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx3b21hbiUyMHByb2Zlc3Npb25hbHxlbnwwfHx8fDE3NjA3MzA4NzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "woman professional"
     },
     {
       "id": "team-4",
       "description": "Portrait of a male analyst.",
-      "imageUrl": "https://picsum.photos/seed/team4/400/400",
+      "imageUrl": "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYW4lMjBwcm9mZXNzaW9uYWx8ZW58MHx8fHwxNzYwNzM0MTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "man professional"
     },
     {
       "id": "services-hero",
       "description": "Blueprint of an architectural design.",
-      "imageUrl": "https://picsum.photos/seed/services/1200/400",
+      "imageUrl": "https://images.unsplash.com/photo-1721244653721-bc681b2dfd27?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxibHVlcHJpbnQlMjBhcmNoaXRlY3R1cmV8ZW58MHx8fHwxNzYwNzc1MTI1fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "blueprint architecture"
+    },
+    {
+      "id": "about-hero",
+      "description": "EV charging station.",
+      "imageUrl": "https://images.unsplash.com/photo-1671782584185-1300064c5289?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZXYlMjBjaGFyZ2luZ3xlbnwwfHx8fDE3NjA3NzUxMjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ev charging"
     }
   ]
 }

@@ -66,36 +66,31 @@ export default function Home() {
         </div>
       </section>
       
-      <section id="about" className="bg-card">
+      <section id="team" className="bg-card">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
-            <div>
-              <Badge className="bg-accent text-accent-foreground">About Us</Badge>
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <Badge className="bg-accent text-accent-foreground">Our Team</Badge>
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mt-4 font-headline">
-                Our Mission &amp; History
+                Meet Our Leadership
               </h2>
-              <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
-                Founded on the principles of innovation, integrity, and quality, ZELESTE has grown from a small team of passionate engineers to a leading name in the contracting industry. Our mission is to deliver exceptional results that exceed client expectations while upholding the highest standards of safety and sustainability.
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Our success is driven by a team of dedicated and experienced professionals.
               </p>
-            </div>
-            <div className="flex flex-col gap-6">
-              <h3 className="text-2xl font-bold tracking-tighter sm:text-3xl font-headline">Meet Our Leadership</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {teamMembers.map(member => {
-                  const image = PlaceHolderImages.find(p => p.id === member.id);
-                  return (
-                    <Card key={member.name} className="flex flex-col items-center p-4 text-center">
-                      <Avatar className="w-24 h-24 mb-4">
-                        {image && <AvatarImage src={image.imageUrl} alt={member.name} data-ai-hint={image.imageHint} />}
-                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <CardTitle className="text-lg font-medium font-headline">{member.name}</CardTitle>
-                      <p className="text-sm text-accent">{member.title}</p>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
+          </div>
+          <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 sm:grid-cols-2 md:grid-cols-4 lg:gap-8">
+            {teamMembers.map(member => {
+              const image = PlaceHolderImages.find(p => p.id === member.id);
+              return (
+                <Card key={member.name} className="flex flex-col items-center p-4 text-center border-0 shadow-none">
+                  <Avatar className="w-32 h-32 mb-4">
+                    {image && <AvatarImage src={image.imageUrl} alt={member.name} data-ai-hint={image.imageHint} />}
+                    <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <CardTitle className="text-lg font-medium font-headline">{member.name}</CardTitle>
+                  <p className="text-sm text-accent">{member.title}</p>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
