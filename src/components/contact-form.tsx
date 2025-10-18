@@ -24,9 +24,7 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-  subject: z.string().min(5, {
-    message: "Subject must be at least 5 characters.",
-  }),
+  phoneNumber: z.string().optional(),
   message: z.string().min(10, {
     message: "Message must be at least 10 characters.",
   }),
@@ -40,7 +38,7 @@ export function ContactForm() {
     defaultValues: {
       name: "",
       email: "",
-      subject: "",
+      phoneNumber: "",
       message: "",
     },
   });
@@ -62,7 +60,7 @@ export function ContactForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Full Name</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input placeholder="John Doe" {...field} />
               </FormControl>
@@ -75,7 +73,7 @@ export function ContactForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email Address</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input placeholder="john.doe@example.com" {...field} />
               </FormControl>
@@ -85,12 +83,12 @@ export function ContactForm() {
         />
         <FormField
           control={form.control}
-          name="subject"
+          name="phoneNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Subject</FormLabel>
+              <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="Project Inquiry" {...field} />
+                <Input placeholder="+1 (555) 123-4567" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -114,7 +112,7 @@ export function ContactForm() {
           )}
         />
         <Button type="submit" className="w-full">
-          Send Message
+          Submit
         </Button>
       </form>
     </Form>

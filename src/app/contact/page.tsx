@@ -10,7 +10,7 @@ export default function ContactPage() {
               Contact Us
             </h1>
             <p className="max-w-2xl mx-auto mt-4 text-lg text-secondary-foreground md:text-xl">
-              We're here to help. Reach out to us with any questions or to discuss your next project.
+              We’d love to hear from you. Whether you’re looking to install an EV charging station or partner with us for a project, feel free to reach out.
             </p>
         </div>
       </section>
@@ -48,7 +48,10 @@ export default function ContactPage() {
               </div>
             </div>
             <div className="p-8 rounded-lg shadow-lg bg-card">
-              <h2 className="text-3xl font-bold mb-6 font-headline">Send Us a Message</h2>
+              <h2 className="text-3xl font-bold mb-2 font-headline">Send Us a Message</h2>
+              <p className="text-muted-foreground mb-6">
+                Use the contact form below to submit your inquiry. Our team will get back to you soon.
+              </p>
               <ContactForm />
             </div>
           </div>
