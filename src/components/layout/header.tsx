@@ -24,11 +24,7 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Zeleste Logo" width={40} height={40} className="h-10 w-10" />
-            <div className="flex flex-col">
-              <span className="font-bold text-lg text-primary font-headline tracking-wider">ZELESTE</span>
-              <span className="text-xs text-muted-foreground -mt-1">ENGINEERS &amp; CONTRACTORS</span>
-            </div>
+            <Image src="/logo.png" alt="Zeleste Logo" width={48} height={48} className="h-12 w-12" />
           </Link>
         </div>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">

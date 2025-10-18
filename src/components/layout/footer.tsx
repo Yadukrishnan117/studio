@@ -10,8 +10,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="flex flex-col space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <Image src="/logo.png" alt="Zeleste Logo" width={40} height={40} className="h-10 w-10" />
-              <span className="font-bold text-lg text-primary font-headline tracking-wider">ZELESTE</span>
+              <Image src="/logo.png" alt="Zeleste Logo" width={48} height={48} className="h-12 w-12" />
             </Link>
             <p className="text-sm">
               Providing top-tier engineering and contracting solutions since 2023.
