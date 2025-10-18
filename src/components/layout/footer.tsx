@@ -1,5 +1,4 @@
 
-import Image from 'next/image'
 import { Github, Twitter, Linkedin, Globe } from 'lucide-react'
 import Link from 'next/link'
 
@@ -10,7 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="flex flex-col space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <Image src="/logo.png" alt="Zeleste Logo" width={48} height={48} className="h-12 w-12" />
+              <span className="font-bold text-2xl text-primary font-headline">ZELESTE</span>
             </Link>
             <p className="text-sm">
               Providing top-tier engineering and contracting solutions since 2023.

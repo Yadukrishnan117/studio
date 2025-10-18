@@ -3,7 +3,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
@@ -24,7 +23,7 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Zeleste Logo" width={48} height={48} className="h-12 w-12" />
+            <span className="font-bold text-xl text-primary font-headline">ZELESTE</span>
           </Link>
         </div>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium ml-auto">
@@ -49,7 +48,7 @@ export function Header() {
             <SheetContent side="right" className="w-[240px]">
               <div className="flex flex-col p-6">
                 <Link href="/" className="mb-8 flex items-center" onClick={() => setIsOpen(false)}>
-                  <Image src="/logo.png" alt="Zeleste Logo" width={40} height={40} className="h-10 w-10" />
+                  <span className="font-bold text-xl text-primary font-headline">ZELESTE</span>
                 </Link>
                 <nav className="flex flex-col space-y-4">
                   {navLinks.map((link) => (
