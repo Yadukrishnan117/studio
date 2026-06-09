@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gati-tech-prod
+  labels:
+    app: gati-tech-ams
+    environment: production
+    team: platform

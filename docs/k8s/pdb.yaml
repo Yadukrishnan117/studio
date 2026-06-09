@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: gati-tech-pdb
+  namespace: gati-tech-prod
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: gati-tech-ams

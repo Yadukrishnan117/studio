@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gati-tech-service
+  namespace: gati-tech-prod
+  labels:
+    app: gati-tech-ams
+spec:
+  type: ClusterIP
+  selector:
+    app: gati-tech-ams
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: gati-tech-prod
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+  - name: redis
+    protocol: TCP
+    port: 6379
+    targetPort: 6379
