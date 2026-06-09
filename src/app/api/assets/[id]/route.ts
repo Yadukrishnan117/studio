@@ -1,3 +1,4 @@
+export const dynamic = 'force-static';
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import { Asset } from '@/models/Asset';
@@ -34,4 +35,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   } catch {
     return NextResponse.json({ success: false, error: 'Failed to delete asset' }, { status: 500 });
   }
+}
+
+export function generateStaticParams() {
+  return [{"id": "GT-ASSET-001"}, {"id": "GT-ASSET-002"}, {"id": "GT-ASSET-003"}, {"id": "GT-ASSET-004"}, {"id": "GT-ASSET-005"}, {"id": "GT-ASSET-006"}, {"id": "GT-ASSET-007"}, {"id": "GT-ASSET-008"}];
 }
