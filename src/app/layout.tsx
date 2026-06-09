@@ -1,32 +1,20 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'ZELESTE ENGINEERS AND CONTRACTORS LLP',
-  description: 'Providing top-tier engineering and contracting solutions.',
+  title: 'Gati-Tech AMS | Automobile Asset Management',
+  description: 'Gati-Tech Asset Management System for Automobile Dealerships',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased">
-        <div className="relative flex min-h-dvh flex-col bg-background">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+    <html lang="en">
+      <body className="antialiased">
+        {children}
         <Toaster />
       </body>
     </html>

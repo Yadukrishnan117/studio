@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gati-tech-config
+  namespace: gati-tech-prod
+  labels:
+    app: gati-tech-ams
+data:
+  NODE_ENV: "production"
+  NEXT_PUBLIC_APP_NAME: "Gati-Tech AMS"
+  NEXT_PUBLIC_COMPANY_NAME: "Gati-Tech Automobile Solutions"
+  NEXTAUTH_URL: "https://ams.gatitech.in"
+  PORT: "3000"
+  LOG_LEVEL: "info"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"

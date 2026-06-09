@@ -4,57 +4,64 @@
 
 @layer base {
   :root {
-    --background: 0 0% 96%;
-    --foreground: 211 33% 28%;
+    --background: 210 20% 96%;
+    --foreground: 213 45% 18%;
     --card: 0 0% 100%;
-    --card-foreground: 211 33% 28%;
+    --card-foreground: 213 45% 18%;
     --popover: 0 0% 100%;
-    --popover-foreground: 211 33% 28%;
-    --primary: 211 33% 28%;
+    --popover-foreground: 213 45% 18%;
+    --primary: 213 60% 24%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 90%;
-    --secondary-foreground: 211 33% 28%;
-    --muted: 0 0% 85%;
-    --muted-foreground: 211 19% 40%;
-    --accent: 211 19% 50%;
+    --secondary: 24 80% 51%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 210 15% 92%;
+    --muted-foreground: 213 25% 45%;
+    --accent: 24 80% 51%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 211 33% 28%;
+    --border: 210 15% 88%;
+    --input: 210 15% 88%;
+    --ring: 213 60% 24%;
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 213 60% 35%;
+    --chart-2: 24 80% 51%;
+    --chart-3: 158 64% 40%;
+    --chart-4: 43 74% 55%;
+    --chart-5: 0 84% 60%;
+    --sidebar: 213 55% 18%;
+    --sidebar-foreground: 210 40% 92%;
+    --sidebar-border: 213 40% 28%;
+    --sidebar-accent: 213 45% 28%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-muted: 213 40% 25%;
+    --sidebar-muted-foreground: 210 25% 65%;
   }
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 211 19% 50%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 211 19% 50%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 213 55% 8%;
+    --foreground: 210 40% 95%;
+    --card: 213 50% 12%;
+    --card-foreground: 210 40% 95%;
+    --popover: 213 50% 12%;
+    --popover-foreground: 210 40% 95%;
+    --primary: 213 70% 55%;
+    --primary-foreground: 213 55% 8%;
+    --secondary: 24 80% 55%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 213 45% 18%;
+    --muted-foreground: 210 25% 60%;
+    --accent: 24 80% 55%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 63% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 213 40% 22%;
+    --input: 213 40% 22%;
+    --ring: 213 70% 55%;
+    --chart-1: 213 70% 55%;
+    --chart-2: 24 80% 55%;
+    --chart-3: 158 64% 45%;
+    --chart-4: 43 74% 60%;
+    --chart-5: 0 84% 60%;
   }
 }
 
@@ -63,10 +70,30 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-    background-color: hsl(0, 0%, 83%); /* User requested #D3D3D3 */
+    @apply bg-background text-foreground font-sans antialiased;
   }
-  section {
-    @apply w-full py-12 md:py-24 lg:py-32;
+}
+
+@layer utilities {
+  .sidebar-gradient {
+    background: linear-gradient(180deg, #1a3c5e 0%, #0f2744 100%);
+  }
+  .gati-card {
+    @apply bg-card rounded-xl border shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+  .status-active {
+    @apply bg-emerald-100 text-emerald-800 border-emerald-200;
+  }
+  .status-maintenance {
+    @apply bg-amber-100 text-amber-800 border-amber-200;
+  }
+  .status-inactive {
+    @apply bg-red-100 text-red-800 border-red-200;
+  }
+  .status-sold {
+    @apply bg-blue-100 text-blue-800 border-blue-200;
+  }
+  .status-available {
+    @apply bg-green-100 text-green-800 border-green-200;
   }
 }

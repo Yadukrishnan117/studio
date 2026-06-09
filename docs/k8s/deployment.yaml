@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gati-tech-app
+  namespace: gati-tech-prod
+  labels:
+    app: gati-tech-ams
+    version: "1.0.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gati-tech-ams
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: gati-tech-ams
+        version: "1.0.0"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - gati-tech-ams
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: gati-tech-app
+        image: ghcr.io/gatitech/ams:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: gati-tech-config
+        - secretRef:
+            name: gati-tech-secrets
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          failureThreshold: 3
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          readOnlyRootFilesystem: false
+          allowPrivilegeEscalation: false
+      securityContext:
+        fsGroup: 1001
+      imagePullSecrets:
+      - name: ghcr-pull-secret
