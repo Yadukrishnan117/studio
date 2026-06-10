@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<style>
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11pt; color: #1a1a1a; margin: 0; padding: 0; }
+  .cover { background: #1e293b; color: white; padding: 80px 60px; min-height: 260px; page-break-after: always; }
+  .cover h1 { font-size: 28pt; font-weight: 700; margin: 0 0 8px; color: #f97316; }
+  .cover h2 { font-size: 16pt; font-weight: 300; margin: 0 0 40px; color: #94a3b8; }
+  .cover table { width: 100%; border-collapse: collapse; }
+  .cover td { padding: 6px 0; font-size: 10pt; color: #cbd5e1; vertical-align: top; }
+  .cover td:first-child { width: 160px; color: #64748b; font-weight: 600; }
+  .toc { padding: 50px 60px; page-break-after: always; }
+  .toc h2 { font-size: 16pt; color: #1e293b; border-bottom: 2px solid #f97316; padding-bottom: 8px; }
+  .toc ol { line-height: 2; font-size: 11pt; }
+  .toc li a { color: #1e293b; text-decoration: none; }
+  section { padding: 40px 60px; page-break-before: always; }
+  h2.section-title { font-size: 18pt; color: #1e293b; border-left: 5px solid #f97316; padding-left: 14px; margin-bottom: 20px; }
+  h3 { font-size: 13pt; color: #334155; margin: 24px 0 10px; }
+  h4 { font-size: 11pt; color: #475569; margin: 18px 0 8px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 10pt; }
+  th { background: #1e293b; color: white; padding: 9px 12px; text-align: left; font-size: 9.5pt; }
+  td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 8.5pt; font-weight: 600; }
+  .badge-red    { background: #fee2e2; color: #991b1b; }
+  .badge-orange { background: #ffedd5; color: #9a3412; }
+  .badge-yellow { background: #fef9c3; color: #713f12; }
+  .badge-green  { background: #dcfce7; color: #166534; }
+  .badge-blue   { background: #dbeafe; color: #1e40af; }
+  .badge-grey   { background: #f1f5f9; color: #475569; }
+  .callout { border-left: 4px solid #f97316; background: #fff7ed; padding: 12px 16px; margin: 16px 0; border-radius: 0 6px 6px 0; font-size: 10pt; }
+  .callout.info { border-color: #3b82f6; background: #eff6ff; }
+  .callout.danger { border-color: #ef4444; background: #fef2f2; }
+  p { line-height: 1.7; }
+  ul li { line-height: 1.8; }
+  .footer-note { font-size: 8.5pt; color: #94a3b8; text-align: center; margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <h1>Gati-Tech AMS</h1>
+  <h2>Quality &amp; Security Testing Report</h2>
+  <table>
+    <tr><td>Project</td><td>Gati-Tech Asset Management System</td></tr>
+    <tr><td>Platform</td><td>Next.js 15 Static Export · GitHub Pages</td></tr>
+    <tr><td>Version</td><td>v1.0.0 (branch: claude/gati-tech-asset-management)</td></tr>
+    <tr><td>Report Date</td><td>10 June 2026</td></tr>
+    <tr><td>Prepared By</td><td>QA Engineering / Claude Code</td></tr>
+    <tr><td>Classification</td><td>Internal / Confidential</td></tr>
+    <tr><td>Covers</td><td>VAPT · Unit Testing · Regression Testing</td></tr>
+  </table>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#vapt">Vulnerability Assessment &amp; Penetration Testing (VAPT)</a>
+      <ol>
+        <li><a href="#vapt-scope">Scope &amp; Methodology</a></li>
+        <li><a href="#vapt-findings">Findings &amp; Risk Register</a></li>
+        <li><a href="#vapt-checklist">Security Checklist (OWASP Top 10)</a></li>
+        <li><a href="#vapt-remediation">Remediation Tracker</a></li>
+      </ol>
+    </li>
+    <li><a href="#unit">Unit Testing</a>
+      <ol>
+        <li><a href="#unit-scope">Scope &amp; Coverage Targets</a></li>
+        <li><a href="#unit-cases">Test Case Register</a></li>
+        <li><a href="#unit-results">Results Summary</a></li>
+      </ol>
+    </li>
+    <li><a href="#regression">Regression Testing</a>
+      <ol>
+        <li><a href="#reg-scope">Scope &amp; Trigger Conditions</a></li>
+        <li><a href="#reg-suites">Test Suites</a></li>
+        <li><a href="#reg-matrix">Regression Matrix</a></li>
+        <li><a href="#reg-results">Execution Results</a></li>
+      </ol>
+    </li>
+    <li><a href="#sign-off">Sign-off</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 1 — VAPT
+═══════════════════════════════════════════════════ -->
+<section id="vapt">
+  <h2 class="section-title">1. Vulnerability Assessment &amp; Penetration Testing (VAPT)</h2>
+
+  <h3 id="vapt-scope">1.1 Scope &amp; Methodology</h3>
+  <table>
+    <tr><th>Item</th><th>Detail</th></tr>
+    <tr><td>Assessment Type</td><td>White-box static analysis + manual review (no live exploitation on production)</td></tr>
+    <tr><td>Target URL</td><td>https://yadukrishnan117.github.io/studio/</td></tr>
+    <tr><td>Source Repository</td><td>github.com/Yadukrishnan117/studio</td></tr>
+    <tr><td>Frameworks</td><td>Next.js 15, React 19, Mongoose 8, Firebase (config only)</td></tr>
+    <tr><td>Standards Applied</td><td>OWASP Top 10 (2021), OWASP WSTG v4.2, CWE/CVE taxonomy</td></tr>
+    <tr><td>Tools Used</td><td>Manual code review, regex analysis, dependency audit (npm audit)</td></tr>
+    <tr><td>Tester</td><td>Internal Security Review</td></tr>
+    <tr><td>Test Period</td><td>10 June 2026</td></tr>
+  </table>
+
+  <h3 id="vapt-findings">1.2 Findings &amp; Risk Register</h3>
+  <table>
+    <tr>
+      <th>#</th><th>Title</th><th>Category (OWASP)</th><th>Severity</th><th>CWE</th><th>Status</th>
+    </tr>
+    <tr>
+      <td>V-001</td>
+      <td>No authentication on any API route</td>
+      <td>A01 Broken Access Control</td>
+      <td><span class="badge badge-red">Critical</span></td>
+      <td>CWE-306</td>
+      <td><span class="badge badge-orange">Open</span></td>
+    </tr>
+    <tr>
+      <td>V-002</td>
+      <td>Plaintext demo password in UI + any password accepted</td>
+      <td>A07 Identification &amp; Auth Failures</td>
+      <td><span class="badge badge-red">Critical</span></td>
+      <td>CWE-521</td>
+      <td><span class="badge badge-orange">Open</span></td>
+    </tr>
+    <tr>
+      <td>V-003</td>
+      <td>Unvalidated &lt;search&gt; param passed to MongoDB $regex (ReDoS)</td>
+      <td>A03 Injection</td>
+      <td><span class="badge badge-red">High</span></td>
+      <td>CWE-730</td>
+      <td><span class="badge badge-orange">Open</span></td>
+    </tr>
+    <tr>
+      <td>V-004</td>
+      <td>Unbounded limit param allows full-collection dump</td>
+      <td>A01 Broken Access Control</td>
+      <td><span class="badge badge-red">High</span></td>
+      <td>CWE-770</td>
+      <td><span class="badge badge-orange">Open</span></td>
+    </tr>
+    <tr>
+      <td>V-005</td>
+      <td>Mass assignment — request body spread directly into Mongoose create()</td>
+      <td>A03 Injection / A04 Insecure Design</td>
+      <td><span class="badge badge-red">High</span></td>
+      <td>CWE-915</td>
+      <td><span class="badge badge-orange">Open</span></td>
+    </tr>
+    <tr>
+      <td>V-006</td>
+      <td>Hardcoded MongoDB fallback URI disables env-variable guard</td>
+      <td>A02 Cryptographic / Config Failures</td>
+      <td><span class="badge badge-yellow">Medium</span></td>
+      <td>CWE-547</td>
+      <td><span class="badge badge-orange">Open</span></td>
+    </tr>
+    <tr>
+      <td>V-007</td>
+      <td>No Content-Security-Policy (CSP) header</td>
+      <td>A05 Security Misconfiguration</td>
+      <td><span class="badge badge-yellow">Medium</span></td>
+      <td>CWE-1021</td>
+      <td><span class="badge badge-orange">Open</span></td>
+    </tr>
+    <tr>
+      <td>V-008</td>
+      <td>localStorage auth token (gati_auth) is not signed/encrypted</td>
+      <td>A02 Cryptographic Failures</td>
+      <td><span class="badge badge-yellow">Medium</span></td>
+      <td>CWE-311</td>
+      <td><span class="badge badge-orange">Open</span></td>
+    </tr>
+    <tr>
+      <td>V-009</td>
+      <td>API routes in static export — silently 404 in production</td>
+      <td>A04 Insecure Design</td>
+      <td><span class="badge badge-yellow">Medium</span></td>
+      <td>CWE-670</td>
+      <td><span class="badge badge-green">Noted</span></td>
+    </tr>
+    <tr>
+      <td>V-010</td>
+      <td>No dashboard auth guard (before fix)</td>
+      <td>A01 Broken Access Control</td>
+      <td><span class="badge badge-red">High</span></td>
+      <td>CWE-306</td>
+      <td><span class="badge badge-green">Fixed</span></td>
+    </tr>
+  </table>
+
+  <h3>1.2.1 Detailed Finding Notes</h3>
+
+  <h4>V-001 — No authentication on API routes</h4>
+  <p>All <code>src/app/api/*/route.ts</code> handlers execute unconditionally. No session token, JWT, or middleware
+  validation is performed. An unauthenticated caller can enumerate all assets, vehicles, customers and maintenance
+  records via HTTP GET, and create/modify records via POST.</p>
+  <div class="callout danger"><strong>Remediation:</strong> Implement NextAuth.js or a signed JWT middleware that validates
+  a Bearer token on every API route. Alternatively, move all data to a backend-for-frontend pattern where the BFF
+  handles auth before proxying.</div>
+
+  <h4>V-003 — MongoDB $regex injection / ReDoS</h4>
+  <p>In <code>src/app/api/assets/route.ts</code> (line 21), <code>src/app/api/vehicles/route.ts</code> (line 21), and
+  <code>src/app/api/maintenance/route.ts</code> (line 19), the <code>search</code> query parameter is interpolated
+  directly into a <code>$regex</code> operator without escaping regex metacharacters.</p>
+  <div class="callout danger"><strong>Remediation:</strong> Escape the search string with a regex-escape utility
+  (e.g. <code>search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&amp;')</code>) before use in $regex. Consider
+  MongoDB text indexes instead of $regex for full-text search.</div>
+
+  <h4>V-005 — Mass assignment</h4>
+  <p>POST body is spread wholesale (<code>{ ...body, assetId }</code>) into Mongoose <code>create()</code>. An attacker
+  can set internal schema fields, override status, or inject unexpected properties.</p>
+  <div class="callout danger"><strong>Remediation:</strong> Use an allowlist: destructure only known fields from
+  <code>body</code> before passing to Mongoose, or use a validation library (Zod, Joi).</div>
+
+  <h3 id="vapt-checklist">1.3 OWASP Top 10 Checklist</h3>
+  <table>
+    <tr><th>#</th><th>Category</th><th>Checked?</th><th>Result</th></tr>
+    <tr><td>A01</td><td>Broken Access Control</td><td>✓</td><td><span class="badge badge-red">Fail</span> — V-001, V-004, V-010</td></tr>
+    <tr><td>A02</td><td>Cryptographic Failures</td><td>✓</td><td><span class="badge badge-yellow">Partial</span> — V-006, V-008</td></tr>
+    <tr><td>A03</td><td>Injection</td><td>✓</td><td><span class="badge badge-red">Fail</span> — V-003, V-005</td></tr>
+    <tr><td>A04</td><td>Insecure Design</td><td>✓</td><td><span class="badge badge-yellow">Partial</span> — V-009</td></tr>
+    <tr><td>A05</td><td>Security Misconfiguration</td><td>✓</td><td><span class="badge badge-yellow">Partial</span> — V-007, missing HSTS</td></tr>
+    <tr><td>A06</td><td>Vulnerable &amp; Outdated Components</td><td>✓</td><td><span class="badge badge-green">Pass</span> — No critical npm advisories</td></tr>
+    <tr><td>A07</td><td>Identification &amp; Auth Failures</td><td>✓</td><td><span class="badge badge-red">Fail</span> — V-002</td></tr>
+    <tr><td>A08</td><td>Software &amp; Data Integrity Failures</td><td>✓</td><td><span class="badge badge-green">Pass</span> — No CI supply-chain issues found</td></tr>
+    <tr><td>A09</td><td>Security Logging &amp; Monitoring Failures</td><td>✓</td><td><span class="badge badge-yellow">Partial</span> — No audit log for data access</td></tr>
+    <tr><td>A10</td><td>Server-Side Request Forgery (SSRF)</td><td>✓</td><td><span class="badge badge-green">Pass</span> — No user-controlled URL fetch found</td></tr>
+  </table>
+
+  <h3 id="vapt-remediation">1.4 Remediation Tracker</h3>
+  <table>
+    <tr><th>ID</th><th>Severity</th><th>Action Required</th><th>Owner</th><th>Target Date</th><th>Verified By</th></tr>
+    <tr><td>V-001</td><td><span class="badge badge-red">Critical</span></td><td>Add JWT middleware to all API routes</td><td></td><td></td><td></td></tr>
+    <tr><td>V-002</td><td><span class="badge badge-red">Critical</span></td><td>Implement real credential validation; remove demo password hint from UI</td><td></td><td></td><td></td></tr>
+    <tr><td>V-003</td><td><span class="badge badge-red">High</span></td><td>Escape regex metacharacters in search param</td><td></td><td></td><td></td></tr>
+    <tr><td>V-004</td><td><span class="badge badge-red">High</span></td><td>Cap limit param to max 100</td><td></td><td></td><td></td></tr>
+    <tr><td>V-005</td><td><span class="badge badge-red">High</span></td><td>Allowlist fields before Mongoose create()</td><td></td><td></td><td></td></tr>
+    <tr><td>V-006</td><td><span class="badge badge-yellow">Medium</span></td><td>Remove hardcoded fallback URI; throw on missing env var</td><td></td><td></td><td></td></tr>
+    <tr><td>V-007</td><td><span class="badge badge-yellow">Medium</span></td><td>Add CSP, X-Frame-Options, X-Content-Type-Options headers</td><td></td><td></td><td></td></tr>
+    <tr><td>V-008</td><td><span class="badge badge-yellow">Medium</span></td><td>Sign localStorage token or replace with httpOnly cookie session</td><td></td><td></td><td></td></tr>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 2 — UNIT TESTING
+═══════════════════════════════════════════════════ -->
+<section id="unit">
+  <h2 class="section-title">2. Unit Testing</h2>
+
+  <h3 id="unit-scope">2.1 Scope &amp; Coverage Targets</h3>
+  <table>
+    <tr><th>Module</th><th>Target Coverage</th><th>Priority</th></tr>
+    <tr><td>Authentication logic (login, logout, auth guard)</td><td>100%</td><td>P1</td></tr>
+    <tr><td>API route handlers (assets, vehicles, maintenance, parts, customers, vendors)</td><td>90%</td><td>P1</td></tr>
+    <tr><td>Mock data utilities / lib/mock-data.ts</td><td>80%</td><td>P2</td></tr>
+    <tr><td>UI components (TopNav, Sidebar, Dashboard cards)</td><td>70%</td><td>P2</td></tr>
+    <tr><td>Filter / search logic on all dashboard pages</td><td>85%</td><td>P1</td></tr>
+    <tr><td>Form validation (Add Asset, Add User, Add Vehicle)</td><td>90%</td><td>P1</td></tr>
+    <tr><td>Notification read/unread state management</td><td>100%</td><td>P2</td></tr>
+  </table>
+  <div class="callout info"><strong>Testing Framework:</strong> Jest + React Testing Library (RTL). Run with
+  <code>npm test -- --coverage</code>. Minimum passing threshold: 80% lines.</div>
+
+  <h3 id="unit-cases">2.2 Test Case Register</h3>
+
+  <h4>UT-AUTH — Authentication</h4>
+  <table>
+    <tr><th>ID</th><th>Test Case</th><th>Input</th><th>Expected Output</th><th>Status</th></tr>
+    <tr><td>UT-AUTH-001</td><td>Valid login stores auth token</td><td>email=admin@gatitech.in, password=any</td><td>localStorage gati_auth is written; redirect to /dashboard</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-AUTH-002</td><td>Empty email blocks login</td><td>email='', password='pass'</td><td>Error message shown; no redirect</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-AUTH-003</td><td>Empty password blocks login</td><td>email='a@b.com', password=''</td><td>Error message shown; no redirect</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-AUTH-004</td><td>Logout clears token and redirects</td><td>gati_auth in localStorage; click Logout</td><td>gati_auth removed; redirected to /login</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-AUTH-005</td><td>Dashboard guard redirects unauthenticated</td><td>No gati_auth; navigate to /dashboard</td><td>Redirected to /login</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-AUTH-006</td><td>Dashboard guard allows authenticated user</td><td>gati_auth set; navigate to /dashboard</td><td>Dashboard renders</td><td><span class="badge badge-grey">Pending</span></td></tr>
+  </table>
+
+  <h4>UT-ASSET — Asset Management</h4>
+  <table>
+    <tr><th>ID</th><th>Test Case</th><th>Input</th><th>Expected Output</th><th>Status</th></tr>
+    <tr><td>UT-ASSET-001</td><td>Asset list renders all mock assets</td><td>initialAssets (15 items)</td><td>15 rows in table</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-ASSET-002</td><td>Search filter narrows results</td><td>search='hydraulic'</td><td>Only matching rows shown</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-ASSET-003</td><td>Status filter works</td><td>statusFilter='active'</td><td>Only active assets shown</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-ASSET-004</td><td>Add Asset with valid data appends row</td><td>name='Lift', category='equipment', branch='Main Branch'</td><td>Row count +1; new asset at top</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-ASSET-005</td><td>Add Asset without required fields does nothing</td><td>name='', category='', branch=''</td><td>No new row; modal stays open</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-ASSET-006</td><td>Delete asset removes row</td><td>Confirm dialog → OK</td><td>Row count -1</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-ASSET-007</td><td>Delete asset cancelled keeps row</td><td>Confirm dialog → Cancel</td><td>Row count unchanged</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-ASSET-008</td><td>View Details opens modal with correct data</td><td>Click row or Eye icon</td><td>Modal shows asset name and ID</td><td><span class="badge badge-grey">Pending</span></td></tr>
+  </table>
+
+  <h4>UT-NOTIF — Notifications</h4>
+  <table>
+    <tr><th>ID</th><th>Test Case</th><th>Input</th><th>Expected Output</th><th>Status</th></tr>
+    <tr><td>UT-NOTIF-001</td><td>Unread badge shows correct count</td><td>2 unread alerts in mock data</td><td>Badge shows '2'</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-NOTIF-002</td><td>Clicking notification marks it read</td><td>Click alert with id='a1'</td><td>Badge count -1; dot indicator gone</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-NOTIF-003</td><td>Mark all read clears badge</td><td>Click 'Mark all read'</td><td>Badge disappears; all items show read styling</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-NOTIF-004</td><td>Read state persists across re-renders</td><td>Mark read; unmount; remount</td><td>Badge still shows updated count</td><td><span class="badge badge-grey">Pending</span></td></tr>
+  </table>
+
+  <h4>UT-API — API Route Handlers</h4>
+  <table>
+    <tr><th>ID</th><th>Test Case</th><th>Input</th><th>Expected Output</th><th>Status</th></tr>
+    <tr><td>UT-API-001</td><td>GET /api/assets returns 200 with array</td><td>No params</td><td>JSON array, status 200</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-API-002</td><td>GET /api/assets?search=lift returns filtered results</td><td>search='lift'</td><td>Only matching records</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-API-003</td><td>POST /api/assets with valid body creates record</td><td>Valid asset JSON</td><td>Status 201, created record returned</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-API-004</td><td>POST /api/assets with missing required fields returns 400</td><td>Missing name</td><td>Status 400 with error message</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-API-005</td><td>GET /api/health returns 200</td><td>No params</td><td>{ status: 'ok' }</td><td><span class="badge badge-grey">Pending</span></td></tr>
+  </table>
+
+  <h4>UT-SETTINGS — Settings Page</h4>
+  <table>
+    <tr><th>ID</th><th>Test Case</th><th>Input</th><th>Expected Output</th><th>Status</th></tr>
+    <tr><td>UT-SET-001</td><td>User Active toggle changes state</td><td>Toggle switch for user u2</td><td>Switch reflects new value; user.isActive updated</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-SET-002</td><td>Delete user removes from list</td><td>Click delete for u3; confirm</td><td>User row removed from table</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-SET-003</td><td>Add User with valid data appends row</td><td>name, email, role, branch all set</td><td>User list +1 row</td><td><span class="badge badge-grey">Pending</span></td></tr>
+    <tr><td>UT-SET-004</td><td>Add User with missing fields is blocked</td><td>name set, email empty</td><td>No new row added</td><td><span class="badge badge-grey">Pending</span></td></tr>
+  </table>
+
+  <h3 id="unit-results">2.3 Results Summary</h3>
+  <table>
+    <tr><th>Suite</th><th>Total</th><th>Passed</th><th>Failed</th><th>Skipped</th><th>Coverage</th></tr>
+    <tr><td>UT-AUTH</td><td>6</td><td>—</td><td>—</td><td>6</td><td>—</td></tr>
+    <tr><td>UT-ASSET</td><td>8</td><td>—</td><td>—</td><td>8</td><td>—</td></tr>
+    <tr><td>UT-NOTIF</td><td>4</td><td>—</td><td>—</td><td>4</td><td>—</td></tr>
+    <tr><td>UT-API</td><td>5</td><td>—</td><td>—</td><td>5</td><td>—</td></tr>
+    <tr><td>UT-SETTINGS</td><td>4</td><td>—</td><td>—</td><td>4</td><td>—</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>27</strong></td><td><strong>0</strong></td><td><strong>0</strong></td><td><strong>27</strong></td><td><strong>N/A — Tests not yet written</strong></td></tr>
+  </table>
+  <div class="callout"><strong>Action Required:</strong> Unit tests have not yet been authored.
+  Install Jest + RTL (<code>npm install --save-dev jest @testing-library/react @testing-library/user-event jest-environment-jsdom</code>)
+  and create test files under <code>src/__tests__/</code>.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 3 — REGRESSION TESTING
+═══════════════════════════════════════════════════ -->
+<section id="regression">
+  <h2 class="section-title">3. Regression Testing</h2>
+
+  <h3 id="reg-scope">3.1 Scope &amp; Trigger Conditions</h3>
+  <p>Regression tests are executed whenever one of the following occurs:</p>
+  <ul>
+    <li>A pull request is merged to <code>main</code></li>
+    <li>A dependency is upgraded (package.json changes)</li>
+    <li>A bug fix is applied to a previously passing area</li>
+    <li>The deployment workflow or Next.js config is modified</li>
+  </ul>
+  <table>
+    <tr><th>Trigger</th><th>Regression Scope</th><th>Automation</th></tr>
+    <tr><td>PR merge to main</td><td>Full suite (all modules)</td><td>GitHub Actions CI</td></tr>
+    <tr><td>Auth change</td><td>UT-AUTH + RT-AUTH</td><td>Manual + CI</td></tr>
+    <tr><td>UI component change</td><td>Affected page + smoke tests</td><td>Manual</td></tr>
+    <tr><td>API route change</td><td>UT-API + RT-API</td><td>CI</td></tr>
+    <tr><td>Next.js config change</td><td>Build verification + RT-DEPLOY</td><td>CI</td></tr>
+  </table>
+
+  <h3 id="reg-suites">3.2 Test Suites</h3>
+
+  <h4>RT-AUTH — Authentication Regression</h4>
+  <table>
+    <tr><th>ID</th><th>Scenario</th><th>Precondition</th><th>Steps</th><th>Expected</th><th>Result</th></tr>
+    <tr>
+      <td>RT-AUTH-001</td><td>Login flow end-to-end</td><td>User is logged out</td>
+      <td>1. Navigate to /login<br/>2. Enter valid credentials<br/>3. Click Sign In</td>
+      <td>Redirected to /dashboard; sidebar visible</td><td><span class="badge badge-grey">Not Run</span></td>
+    </tr>
+    <tr>
+      <td>RT-AUTH-002</td><td>Logout flow end-to-end</td><td>User is logged in</td>
+      <td>1. Click logout icon in sidebar<br/>2. Observe redirect</td>
+      <td>Redirected to /login; /dashboard no longer accessible</td><td><span class="badge badge-grey">Not Run</span></td>
+    </tr>
+    <tr>
+      <td>RT-AUTH-003</td><td>Direct URL access while unauthenticated</td><td>No gati_auth in localStorage</td>
+      <td>1. Navigate directly to /dashboard/vehicles</td>
+      <td>Redirected to /login</td><td><span class="badge badge-grey">Not Run</span></td>
+    </tr>
+    <tr>
+      <td>RT-AUTH-004</td><td>Session persists across page refresh</td><td>User is logged in</td>
+      <td>1. Reload the browser<br/>2. Navigate to /dashboard</td>
+      <td>Dashboard loads without redirect</td><td><span class="badge badge-grey">Not Run</span></td>
+    </tr>
+  </table>
+
+  <h4>RT-NAV — Navigation &amp; Routing</h4>
+  <table>
+    <tr><th>ID</th><th>Scenario</th><th>Steps</th><th>Expected</th><th>Result</th></tr>
+    <tr><td>RT-NAV-001</td><td>Sidebar links navigate correctly</td><td>Click each sidebar item</td><td>Each page loads with correct title and subtitle</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-NAV-002</td><td>Quick Add navigates to correct page</td><td>Click Add New → Add Vehicle</td><td>Navigated to /dashboard/vehicles</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-NAV-003</td><td>Root URL redirects to login</td><td>Navigate to yadukrishnan117.github.io/studio/</td><td>Redirected to /studio/login</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-NAV-004</td><td>Mobile menu opens and navigates</td><td>Viewport &lt; 1024px; click hamburger; click nav item</td><td>Sheet opens; page changes; sheet closes</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+  </table>
+
+  <h4>RT-ASSET — Asset CRUD Regression</h4>
+  <table>
+    <tr><th>ID</th><th>Scenario</th><th>Steps</th><th>Expected</th><th>Result</th></tr>
+    <tr><td>RT-ASSET-001</td><td>Asset list loads with data</td><td>Navigate to /dashboard/assets</td><td>Table shows ≥1 asset row</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-ASSET-002</td><td>Search filters in real-time</td><td>Type 'lift' in search box</td><td>Table filtered to matching assets only</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-ASSET-003</td><td>Add asset form completes successfully</td><td>Fill all required fields; click Add Asset</td><td>New row appears at top of table</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-ASSET-004</td><td>Delete asset removes row</td><td>Click ⋯ → Delete → OK in confirm</td><td>Row removed from table</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-ASSET-005</td><td>Asset detail modal opens and closes</td><td>Click on an asset row</td><td>Modal with asset details opens; X closes it</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+  </table>
+
+  <h4>RT-NOTIF — Notifications Regression</h4>
+  <table>
+    <tr><th>ID</th><th>Scenario</th><th>Steps</th><th>Expected</th><th>Result</th></tr>
+    <tr><td>RT-NOTIF-001</td><td>Badge shows unread count on load</td><td>Load dashboard</td><td>Bell icon shows red badge with count</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-NOTIF-002</td><td>Clicking notification marks read</td><td>Open bell menu; click a notification</td><td>Blue dot disappears; badge count decrements</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-NOTIF-003</td><td>Mark all read clears badge</td><td>Click 'Mark all read'</td><td>Badge disappears</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+  </table>
+
+  <h4>RT-SETTINGS — Settings Regression</h4>
+  <table>
+    <tr><th>ID</th><th>Scenario</th><th>Steps</th><th>Expected</th><th>Result</th></tr>
+    <tr><td>RT-SET-001</td><td>User toggle changes isActive</td><td>Toggle switch for any user</td><td>Switch flips; no JS error</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-SET-002</td><td>Add user dialog opens and submits</td><td>Click Add User; fill form; click Add User</td><td>New user row appears in table</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-SET-003</td><td>Delete user with confirmation</td><td>Click Trash for a user; confirm</td><td>User removed from table</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+  </table>
+
+  <h4>RT-DEPLOY — Deployment / Build Regression</h4>
+  <table>
+    <tr><th>ID</th><th>Scenario</th><th>Steps</th><th>Expected</th><th>Result</th></tr>
+    <tr><td>RT-DEP-001</td><td>npm run build produces no errors</td><td>Run npm run build</td><td>Exit code 0; out/ directory created</td><td><span class="badge badge-green">Pass</span></td></tr>
+    <tr><td>RT-DEP-002</td><td>All pages statically exported</td><td>Check out/ after build</td><td>index.html, login/, dashboard/* all present</td><td><span class="badge badge-green">Pass</span></td></tr>
+    <tr><td>RT-DEP-003</td><td>GitHub Actions deploy workflow succeeds</td><td>Push to main; observe Actions tab</td><td>Build + Deploy jobs both green</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+    <tr><td>RT-DEP-004</td><td>Live URL responds with 200</td><td>curl https://yadukrishnan117.github.io/studio/</td><td>HTTP 200; &lt;title&gt;Gati-Tech AMS</td><td><span class="badge badge-grey">Not Run</span></td></tr>
+  </table>
+
+  <h3 id="reg-matrix">3.3 Regression Matrix — Feature vs Change Area</h3>
+  <table>
+    <tr>
+      <th>Test Suite \ Change Area</th>
+      <th>Auth</th><th>Sidebar/<br/>TopNav</th><th>Assets<br/>Page</th><th>Settings<br/>Page</th><th>API<br/>Routes</th><th>Build/<br/>Config</th>
+    </tr>
+    <tr><td>RT-AUTH</td><td>✓ Run</td><td>✓ Run</td><td>—</td><td>—</td><td>—</td><td>✓ Run</td></tr>
+    <tr><td>RT-NAV</td><td>—</td><td>✓ Run</td><td>—</td><td>—</td><td>—</td><td>✓ Run</td></tr>
+    <tr><td>RT-ASSET</td><td>—</td><td>—</td><td>✓ Run</td><td>—</td><td>✓ Run</td><td>—</td></tr>
+    <tr><td>RT-NOTIF</td><td>—</td><td>✓ Run</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>RT-SETTINGS</td><td>✓ Run</td><td>—</td><td>—</td><td>✓ Run</td><td>—</td><td>—</td></tr>
+    <tr><td>RT-DEPLOY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✓ Run</td></tr>
+  </table>
+
+  <h3 id="reg-results">3.4 Execution Results</h3>
+  <table>
+    <tr><th>Suite</th><th>Total Cases</th><th>Passed</th><th>Failed</th><th>Blocked</th><th>Not Run</th></tr>
+    <tr><td>RT-AUTH</td><td>4</td><td>—</td><td>—</td><td>—</td><td>4</td></tr>
+    <tr><td>RT-NAV</td><td>4</td><td>—</td><td>—</td><td>—</td><td>4</td></tr>
+    <tr><td>RT-ASSET</td><td>5</td><td>—</td><td>—</td><td>—</td><td>5</td></tr>
+    <tr><td>RT-NOTIF</td><td>3</td><td>—</td><td>—</td><td>—</td><td>3</td></tr>
+    <tr><td>RT-SETTINGS</td><td>3</td><td>—</td><td>—</td><td>—</td><td>3</td></tr>
+    <tr><td>RT-DEPLOY</td><td>4</td><td>2</td><td>0</td><td>0</td><td>2</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>23</strong></td><td><strong>2</strong></td><td><strong>0</strong></td><td><strong>0</strong></td><td><strong>21</strong></td></tr>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 4 — SIGN-OFF
+═══════════════════════════════════════════════════ -->
+<section id="sign-off">
+  <h2 class="section-title">4. Sign-off</h2>
+  <table>
+    <tr><th>Role</th><th>Name</th><th>Signature</th><th>Date</th><th>Decision</th></tr>
+    <tr><td>Developer</td><td></td><td></td><td></td><td>
+      <select style="font-size:10pt; padding:2px 6px; border:1px solid #e2e8f0; border-radius:4px;">
+        <option>Approved</option><option>Approved with conditions</option><option>Rejected</option>
+      </select>
+    </td></tr>
+    <tr><td>QA Lead</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Security Reviewer</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Product Manager</td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <div class="callout">
+    <strong>Release Criteria (must all be met before production go-live):</strong>
+    <ul>
+      <li>All Critical and High VAPT findings remediated (V-001 through V-005)</li>
+      <li>All RT-AUTH and RT-DEPLOY regression tests passing</li>
+      <li>Unit test coverage ≥ 80% on auth and asset modules</li>
+      <li>No open P1 bugs in the issue tracker</li>
+    </ul>
+  </div>
+
+  <p class="footer-note">
+    Gati-Tech AMS · Quality &amp; Security Testing Report · v1.0 · 10 June 2026 · Internal / Confidential
+  </p>
+</section>
+
+</body>
+</html>
