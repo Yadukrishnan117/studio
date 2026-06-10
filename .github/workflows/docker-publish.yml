@@ -1,15 +1,7 @@
 name: Build & Publish Docker Image
 
 on:
-  push:
-    branches:
-      - main
-      - 'claude/**'
-    tags:
-      - 'v*.*.*'
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:  # manual trigger only — app uses GitHub Pages (static export)
 
 env:
   REGISTRY: ghcr.io
@@ -69,7 +61,7 @@ jobs:
             MONGODB_URI=${{ secrets.MONGODB_URI || 'mongodb://placeholder:27017/gati-tech-ams' }}
             NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET || 'build-placeholder' }}
             NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL || 'http://localhost:3000' }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
 
       - name: Output image digest
         if: github.event_name != 'pull_request'
