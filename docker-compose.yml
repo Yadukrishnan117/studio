@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_APP_NAME: "Gati-Tech AMS"
+        NEXT_PUBLIC_COMPANY_NAME: "Gati-Tech Automobile Solutions"
+        MONGODB_URI: "mongodb://mongo:27017/gati-tech-ams"
+        NEXTAUTH_SECRET: "local-dev-secret-change-in-production"
+        NEXTAUTH_URL: "http://localhost:3000"
+    ports:
+      - "3000:3000"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/gati-tech-ams
+      NEXTAUTH_SECRET: local-dev-secret-change-in-production
+      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_NAME: "Gati-Tech AMS"
+      NEXT_PUBLIC_COMPANY_NAME: "Gati-Tech Automobile Solutions"
+      NODE_ENV: production
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - gati-network
+
+  mongo:
+    image: mongo:7-jammy
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - gati-network
+
+volumes:
+  mongo-data:
+
+networks:
+  gati-network:
+    driver: bridge
