@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { mockAssets } from '@/lib/mock-data';
+import { mockAssets as initialAssets } from '@/lib/mock-data';
 import { Asset } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,13 +35,46 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 export default function AssetsPage() {
+  const [assets, setAssets] = useState<Asset[]>(initialAssets);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [viewAsset, setViewAsset] = useState<Asset | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({ name: '', serialNumber: '', make: '', model: '', purchasePrice: '', currentValue: '', category: '', branch: '' });
 
-  const filtered = mockAssets.filter(a => {
+  const handleAddAsset = () => {
+    if (!addForm.name || !addForm.category || !addForm.branch) return;
+    const newAsset: Asset = {
+      id: `asset-${Date.now()}`,
+      assetId: `GT-ASSET-${String(assets.length + 1).padStart(3, '0')}`,
+      name: addForm.name,
+      category: addForm.category as Asset['category'],
+      status: 'active',
+      condition: 'good',
+      location: addForm.branch,
+      branch: addForm.branch,
+      purchaseDate: new Date().toISOString(),
+      purchasePrice: Number(addForm.purchasePrice) || 0,
+      currentValue: Number(addForm.currentValue) || 0,
+      depreciationRate: 10,
+      serialNumber: addForm.serialNumber,
+      make: addForm.make,
+      model: addForm.model,
+      tags: [],
+    } as unknown as Asset;
+    setAssets(prev => [newAsset, ...prev]);
+    setAddForm({ name: '', serialNumber: '', make: '', model: '', purchasePrice: '', currentValue: '', category: '', branch: '' });
+    setShowAddModal(false);
+  };
+
+  const handleDeleteAsset = (id: string) => {
+    if (confirm('Are you sure you want to delete this asset?')) {
+      setAssets(prev => prev.filter(a => a.id !== id));
+    }
+  };
+
+  const filtered = assets.filter(a => {
     const matchesSearch = !search ||
       a.name.toLowerCase().includes(search.toLowerCase()) ||
       a.assetId.toLowerCase().includes(search.toLowerCase()) ||
@@ -235,11 +268,11 @@ export default function AssetsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => setViewAsset(asset)}><Eye className="w-3.5 h-3.5 mr-2" />View Details</DropdownMenuItem>
-                          <DropdownMenuItem><Edit className="w-3.5 h-3.5 mr-2" />Edit Asset</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => { setViewAsset(asset); }}><Edit className="w-3.5 h-3.5 mr-2" />Edit Asset</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem><Wrench className="w-3.5 h-3.5 mr-2" />Create Work Order</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.location.href = '/dashboard/maintenance'}><Wrench className="w-3.5 h-3.5 mr-2" />Create Work Order</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600"><Trash2 className="w-3.5 h-3.5 mr-2" />Delete</DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteAsset(asset.id)}><Trash2 className="w-3.5 h-3.5 mr-2" />Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -305,8 +338,8 @@ export default function AssetsPage() {
                 </div>
               )}
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <Button variant="outline" className="flex-1"><Edit className="w-4 h-4 mr-2" />Edit</Button>
-                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"><Wrench className="w-4 h-4 mr-2" />Work Order</Button>
+                <Button variant="outline" className="flex-1" onClick={() => { setShowAddModal(true); setViewAsset(null); }}><Edit className="w-4 h-4 mr-2" />Edit</Button>
+                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white" onClick={() => { setViewAsset(null); window.location.href = '/dashboard/maintenance'; }}><Wrench className="w-4 h-4 mr-2" />Work Order</Button>
               </div>
             </>
           )}
@@ -321,24 +354,30 @@ export default function AssetsPage() {
             <DialogDescription>Register a new asset in the system</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 mt-4">
-            {[
+            {([
               { id:'name', label:'Asset Name *', placeholder:'e.g. Hydraulic Lift Bay 2' },
               { id:'serialNumber', label:'Serial Number', placeholder:'SN-XXXX-XXXX' },
               { id:'make', label:'Make', placeholder:'e.g. BendPak' },
               { id:'model', label:'Model', placeholder:'e.g. HD-9XW' },
               { id:'purchasePrice', label:'Purchase Price (₹) *', placeholder:'250000' },
               { id:'currentValue', label:'Current Value (₹) *', placeholder:'220000' },
-            ].map(({ id, label, placeholder }) => (
+            ] as { id: keyof typeof addForm; label: string; placeholder: string }[]).map(({ id, label, placeholder }) => (
               <div key={id} className="space-y-1.5">
                 <Label htmlFor={id} className="text-xs">{label}</Label>
-                <Input id={id} placeholder={placeholder} className="h-9" />
+                <Input
+                  id={id}
+                  placeholder={placeholder}
+                  className="h-9"
+                  value={addForm[id]}
+                  onChange={e => setAddForm(f => ({ ...f, [id]: e.target.value }))}
+                />
               </div>
             ))}
           </div>
           <div className="grid grid-cols-2 gap-4 mt-2">
             <div className="space-y-1.5">
               <Label className="text-xs">Category *</Label>
-              <Select>
+              <Select value={addForm.category} onValueChange={v => setAddForm(f => ({ ...f, category: v }))}>
                 <SelectTrigger className="h-9"><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
                   {Object.entries(CATEGORY_ICONS).map(([v, icon]) => (
@@ -349,19 +388,19 @@ export default function AssetsPage() {
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">Branch *</Label>
-              <Select>
+              <Select value={addForm.branch} onValueChange={v => setAddForm(f => ({ ...f, branch: v }))}>
                 <SelectTrigger className="h-9"><SelectValue placeholder="Select branch" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="main">Main Branch - Chennai</SelectItem>
-                  <SelectItem value="annanagar">Anna Nagar Branch</SelectItem>
-                  <SelectItem value="omr">OMR Branch</SelectItem>
+                  <SelectItem value="Main Branch - Chennai">Main Branch - Chennai</SelectItem>
+                  <SelectItem value="Anna Nagar Branch">Anna Nagar Branch</SelectItem>
+                  <SelectItem value="OMR Branch">OMR Branch</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" className="flex-1" onClick={() => setShowAddModal(false)}>Cancel</Button>
-            <Button className="flex-1 bg-primary text-white" onClick={() => setShowAddModal(false)}>Add Asset</Button>
+            <Button className="flex-1 bg-primary text-white" onClick={handleAddAsset}>Add Asset</Button>
           </div>
         </DialogContent>
       </Dialog>

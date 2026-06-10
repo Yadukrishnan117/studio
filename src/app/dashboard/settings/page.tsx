@@ -35,6 +35,8 @@ const ROLE_CONFIG: Record<string, { label: string; className: string }> = {
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
+  const [users, setUsers] = useState(mockUsers);
+  const [newUser, setNewUser] = useState({ name: '', email: '', role: '', branch: '' });
 
   const handleSave = async () => {
     setSaved(true);
@@ -147,7 +149,7 @@ export default function SettingsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mockUsers.map(user => (
+                  {users.map(user => (
                     <TableRow key={user.id} className="hover:bg-muted/20">
                       <TableCell className="pl-6">
                         <div className="flex items-center gap-2">
@@ -166,12 +168,24 @@ export default function SettingsPage() {
                       <TableCell className="text-xs text-muted-foreground">{user.branch}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{user.lastLogin}</TableCell>
                       <TableCell>
-                        <Switch checked={user.isActive} />
+                        <Switch
+                          checked={user.isActive}
+                          onCheckedChange={val =>
+                            setUsers(prev => prev.map(u => u.id === user.id ? { ...u, isActive: val } : u))
+                          }
+                        />
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><Edit className="w-3.5 h-3.5" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit user"><Edit className="w-3.5 h-3.5" /></Button>
+                          <Button
+                            variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600"
+                            title="Delete user"
+                            onClick={() => {
+                              if (confirm(`Remove ${user.name}?`))
+                                setUsers(prev => prev.filter(u => u.id !== user.id));
+                            }}
+                          ><Trash2 className="w-3.5 h-3.5" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -185,22 +199,25 @@ export default function SettingsPage() {
             <DialogContent className="max-w-md">
               <DialogHeader><DialogTitle>Add New User</DialogTitle></DialogHeader>
               <div className="grid grid-cols-2 gap-4 mt-4">
-                {[
-                  { id: 'fn', label: 'First Name *', placeholder: 'First name' },
-                  { id: 'ln', label: 'Last Name *', placeholder: 'Last name' },
+                {([
+                  { id: 'name', label: 'Full Name *', placeholder: 'Full name' },
                   { id: 'email', label: 'Email *', placeholder: 'email@gatitech.in' },
-                  { id: 'phone', label: 'Phone', placeholder: '+91-XXXXX-XXXXX' },
-                ].map(({ id, label, placeholder }) => (
+                ] as { id: keyof typeof newUser; label: string; placeholder: string }[]).map(({ id, label, placeholder }) => (
                   <div key={id} className="space-y-1.5">
                     <Label className="text-xs">{label}</Label>
-                    <Input placeholder={placeholder} className="h-9" />
+                    <Input
+                      placeholder={placeholder}
+                      className="h-9"
+                      value={newUser[id]}
+                      onChange={e => setNewUser(u => ({ ...u, [id]: e.target.value }))}
+                    />
                   </div>
                 ))}
               </div>
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <div className="space-y-1.5">
                   <Label className="text-xs">Role *</Label>
-                  <Select>
+                  <Select value={newUser.role} onValueChange={v => setNewUser(u => ({ ...u, role: v }))}>
                     <SelectTrigger className="h-9"><SelectValue placeholder="Select role" /></SelectTrigger>
                     <SelectContent>
                       {Object.entries(ROLE_CONFIG).map(([v, c]) => <SelectItem key={v} value={v}>{c.label}</SelectItem>)}
@@ -209,20 +226,31 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Branch *</Label>
-                  <Select>
+                  <Select value={newUser.branch} onValueChange={v => setNewUser(u => ({ ...u, branch: v }))}>
                     <SelectTrigger className="h-9"><SelectValue placeholder="Select branch" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="main">Main Branch</SelectItem>
-                      <SelectItem value="an">Anna Nagar</SelectItem>
-                      <SelectItem value="omr">OMR Branch</SelectItem>
-                      <SelectItem value="all">All Branches</SelectItem>
+                      <SelectItem value="Main Branch - Chennai">Main Branch</SelectItem>
+                      <SelectItem value="Anna Nagar Branch">Anna Nagar</SelectItem>
+                      <SelectItem value="OMR Branch">OMR Branch</SelectItem>
+                      <SelectItem value="All Branches">All Branches</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
                 <Button variant="outline" className="flex-1" onClick={() => setShowAddUser(false)}>Cancel</Button>
-                <Button className="flex-1 bg-primary text-white" onClick={() => setShowAddUser(false)}>Add User</Button>
+                <Button
+                  className="flex-1 bg-primary text-white"
+                  onClick={() => {
+                    if (!newUser.name || !newUser.email || !newUser.role || !newUser.branch) return;
+                    setUsers(prev => [...prev, {
+                      id: `u${Date.now()}`, name: newUser.name, email: newUser.email,
+                      role: newUser.role, branch: newUser.branch, isActive: true, lastLogin: 'Never',
+                    }]);
+                    setNewUser({ name: '', email: '', role: '', branch: '' });
+                    setShowAddUser(false);
+                  }}
+                >Add User</Button>
               </div>
             </DialogContent>
           </Dialog>

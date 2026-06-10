@@ -26,6 +26,7 @@ export default function LoginPage() {
     await new Promise(resolve => setTimeout(resolve, 1200));
 
     if (email && password) {
+      localStorage.setItem('gati_auth', JSON.stringify({ email, role: 'admin', ts: Date.now() }));
       router.push('/dashboard');
     } else {
       setError('Please enter valid credentials');

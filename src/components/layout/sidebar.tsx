@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, Car, Package, Wrench, Boxes, Users, Building2,
@@ -32,6 +32,12 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem('gati_auth');
+    router.push('/login');
+  };
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;
@@ -123,7 +129,11 @@ export function Sidebar({ className }: SidebarProps) {
             <p className="text-xs font-medium text-white truncate">Admin User</p>
             <p className="text-xs text-white/50 truncate">Super Admin</p>
           </div>
-          <button className="text-white/50 hover:text-white transition-colors">
+          <button
+            onClick={handleLogout}
+            className="text-white/50 hover:text-white transition-colors"
+            title="Log out"
+          >
             <LogOut style={{width: '15px', height: '15px'}} />
           </button>
         </div>

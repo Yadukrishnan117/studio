@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { Bell, Search, Menu, Plus, RefreshCw, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,15 +25,41 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   '/dashboard/settings': { title: 'Settings', subtitle: 'System configuration and preferences' },
 };
 
+const STORAGE_KEY = 'gati_read_notifications';
+
 interface TopNavProps {
   onMobileMenuToggle?: () => void;
 }
 
 export function TopNav({ onMobileMenuToggle }: TopNavProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
 
-  const unreadAlerts = mockDashboardData.alerts.filter(a => !a.isRead).length;
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) setReadIds(new Set(JSON.parse(stored)));
+    } catch {}
+  }, []);
+
+  const markAsRead = (id: string) => {
+    setReadIds(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  };
+
+  const markAllRead = () => {
+    const allIds = mockDashboardData.alerts.map(a => a.id);
+    setReadIds(new Set(allIds));
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allIds)); } catch {}
+  };
+
+  const unreadAlerts = mockDashboardData.alerts.filter(a => !readIds.has(a.id) && !a.isRead).length;
   const pageInfo = PAGE_TITLES[pathname] || { title: 'Gati-Tech AMS', subtitle: '' };
 
   return (
@@ -82,25 +108,47 @@ export function TopNav({ onMobileMenuToggle }: TopNavProps) {
           <DropdownMenuContent align="end" className="w-80">
             <DropdownMenuLabel className="flex items-center justify-between">
               <span>Notifications</span>
-              <Badge variant="secondary">{unreadAlerts} new</Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">{unreadAlerts} new</Badge>
+                {unreadAlerts > 0 && (
+                  <button
+                    onClick={markAllRead}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Mark all read
+                  </button>
+                )}
+              </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {mockDashboardData.alerts.slice(0, 4).map((alert) => (
-              <DropdownMenuItem key={alert.id} className="flex-col items-start gap-1 py-3 cursor-pointer">
-                <div className="flex items-center gap-2 w-full">
-                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    alert.type === 'error' ? 'bg-red-500' :
-                    alert.type === 'warning' ? 'bg-amber-500' :
-                    alert.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
-                  }`} />
-                  <span className="text-sm font-medium flex-1">{alert.title}</span>
-                  {!alert.isRead && <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
-                </div>
-                <p className="text-xs text-muted-foreground ml-4 line-clamp-2">{alert.message}</p>
-              </DropdownMenuItem>
-            ))}
+            {mockDashboardData.alerts.slice(0, 4).map((alert) => {
+              const isRead = readIds.has(alert.id) || alert.isRead;
+              return (
+                <DropdownMenuItem
+                  key={alert.id}
+                  className="flex-col items-start gap-1 py-3 cursor-pointer"
+                  onClick={() => markAsRead(alert.id)}
+                >
+                  <div className="flex items-center gap-2 w-full">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                      alert.type === 'error' ? 'bg-red-500' :
+                      alert.type === 'warning' ? 'bg-amber-500' :
+                      alert.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+                    }`} />
+                    <span className={`text-sm flex-1 ${isRead ? 'font-normal text-muted-foreground' : 'font-medium'}`}>
+                      {alert.title}
+                    </span>
+                    {!isRead && <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                  </div>
+                  <p className="text-xs text-muted-foreground ml-4 line-clamp-2">{alert.message}</p>
+                </DropdownMenuItem>
+              );
+            })}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-center text-sm text-primary justify-center">
+            <DropdownMenuItem
+              className="text-center text-sm text-primary justify-center"
+              onClick={() => router.push('/dashboard')}
+            >
               View all notifications
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -117,11 +165,11 @@ export function TopNav({ onMobileMenuToggle }: TopNavProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Quick Add</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Add Vehicle</DropdownMenuItem>
-            <DropdownMenuItem>Add Asset</DropdownMenuItem>
-            <DropdownMenuItem>New Work Order</DropdownMenuItem>
-            <DropdownMenuItem>Add Customer</DropdownMenuItem>
-            <DropdownMenuItem>Add Part</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/vehicles')}>Add Vehicle</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/assets')}>Add Asset</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/maintenance')}>New Work Order</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/customers')}>Add Customer</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/parts')}>Add Part</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
