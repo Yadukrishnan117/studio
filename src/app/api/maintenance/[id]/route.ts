@@ -1,3 +1,4 @@
+export const dynamic = 'force-static';
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import { Maintenance } from '@/models/Maintenance';
@@ -26,4 +27,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   } catch {
     return NextResponse.json({ success: false, error: 'Failed to update work order' }, { status: 500 });
   }
+}
+
+export function generateStaticParams() {
+  return [{"id": "MO-001"}];
 }
