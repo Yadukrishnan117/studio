@@ -1,15 +1,7 @@
 name: Build & Publish Docker Image
 
 on:
-  push:
-    branches:
-      - main
-      - 'claude/**'
-    tags:
-      - 'v*.*.*'
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:  # manual trigger only — app uses GitHub Pages (static export)
 
 env:
   REGISTRY: ghcr.io
