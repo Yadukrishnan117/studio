@@ -1,14 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, Car, Package, Wrench, Boxes, Users, Building2,
   BarChart3, FileText, Settings, ChevronRight, Gauge, Bell, LogOut,
-  UserCircle, MapPin
+  UserCircle, MapPin, Zap
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import type { PlanId } from '@/lib/plans';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -30,8 +32,35 @@ interface SidebarProps {
   className?: string;
 }
 
+const PLAN_PILL: Record<string, { label: string; className: string }> = {
+  starter: { label: 'Starter Plan', className: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
+  pro: { label: 'Pro Plan', className: 'bg-orange-500/20 text-orange-300 border-orange-500/30' },
+  enterprise: { label: 'Enterprise', className: 'bg-violet-500/20 text-violet-300 border-violet-500/30' },
+};
+
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [planId, setPlanId] = useState<PlanId>('starter');
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('gati_auth');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.plan && parsed.plan in PLAN_PILL) {
+          setPlanId(parsed.plan as PlanId);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('gati_auth');
+    router.push('/login');
+  };
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;
@@ -114,6 +143,19 @@ export function Sidebar({ className }: SidebarProps) {
           );
         })}
 
+        {/* Plan Badge */}
+        <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 mt-1">
+          <div className="flex items-center gap-2">
+            <Zap style={{width: '13px', height: '13px'}} className="text-orange-400 flex-shrink-0" />
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${PLAN_PILL[planId]?.className ?? PLAN_PILL.starter.className}`}>
+              {PLAN_PILL[planId]?.label ?? 'Starter Plan'}
+            </span>
+          </div>
+          <Link href="/pricing" className="text-xs text-orange-400 hover:text-orange-300 font-medium transition-colors">
+            Upgrade
+          </Link>
+        </div>
+
         {/* User Profile */}
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg mt-1 bg-white/5">
           <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0">
@@ -123,7 +165,11 @@ export function Sidebar({ className }: SidebarProps) {
             <p className="text-xs font-medium text-white truncate">Admin User</p>
             <p className="text-xs text-white/50 truncate">Super Admin</p>
           </div>
-          <button className="text-white/50 hover:text-white transition-colors">
+          <button
+            onClick={handleLogout}
+            className="text-white/50 hover:text-white transition-colors"
+            title="Log out"
+          >
             <LogOut style={{width: '15px', height: '15px'}} />
           </button>
         </div>

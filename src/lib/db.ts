@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gati-tech-ams';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define MONGODB_URI in .env.local');
+  throw new Error(
+    'MONGODB_URI environment variable is not set. ' +
+    'Add it to .env.local for development or set it in your deployment environment.'
+  );
 }
 
 interface MongooseCache {
@@ -25,7 +28,7 @@ export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
+    cached.promise = mongoose.connect(MONGODB_URI!, {
       bufferCommands: false,
     });
   }
