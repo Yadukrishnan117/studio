@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { mockDashboardData, salesTrendData } from '@/lib/mock-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,6 +44,13 @@ const ALERT_COLORS: Record<string, string> = {
   success: 'text-emerald-600 bg-emerald-50 border-emerald-100',
 };
 
+const ALERT_LINKS: Record<string, string> = {
+  maintenance: '/dashboard/maintenance',
+  part: '/dashboard/parts',
+  asset: '/dashboard/assets',
+  vehicle: '/dashboard/vehicles',
+};
+
 const PIE_COLORS = ['#1a3c5e', '#e8821a', '#10b981', '#f59e0b', '#8b5cf6'];
 
 const ACTIVITY_ICONS: Record<string, React.ComponentType<any>> = {
@@ -65,6 +73,7 @@ const ACTIVITY_COLORS: Record<string, string> = {
 
 export default function DashboardPage() {
   const { kpis, assetsByCategory, maintenanceTrend, vehiclesByStatus, recentActivities, alerts } = mockDashboardData;
+  const [showAllActivity, setShowAllActivity] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -107,13 +116,20 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
             {alerts.filter(a => !a.isRead).map((alert) => {
               const Icon = ALERT_ICON[alert.type];
+              const link = alert.entityType ? ALERT_LINKS[alert.entityType] : undefined;
               return (
-                <div key={alert.id} className={`flex items-start gap-3 p-3 rounded-lg border text-sm ${ALERT_COLORS[alert.type]}`}>
+                <div
+                  key={alert.id}
+                  role={link ? 'button' : undefined}
+                  className={`flex items-start gap-3 p-3 rounded-lg border text-sm ${ALERT_COLORS[alert.type]} ${link ? 'cursor-pointer hover:shadow-sm transition-shadow' : ''}`}
+                  onClick={() => { if (link) window.location.href = link; }}
+                >
                   <Icon className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="font-medium">{alert.title}</p>
                     <p className="text-xs opacity-80 mt-0.5 line-clamp-2">{alert.message}</p>
                   </div>
+                  {link && <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0 opacity-50" />}
                 </div>
               );
             })}
@@ -274,7 +290,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentActivities.slice(0, 5).map((activity) => {
+              {(showAllActivity ? recentActivities : recentActivities.slice(0, 5)).map((activity) => {
                 const Icon = ACTIVITY_ICONS[activity.type] || Package;
                 const colorClass = ACTIVITY_COLORS[activity.type] || 'bg-gray-100 text-gray-700';
                 return (
@@ -296,8 +312,14 @@ export default function DashboardPage() {
                 );
               })}
             </div>
-            <Button variant="ghost" size="sm" className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground">
-              View all activity <ChevronRight className="w-3.5 h-3.5 ml-1" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => setShowAllActivity(prev => !prev)}
+            >
+              {showAllActivity ? 'Show less' : `View all activity (${recentActivities.length})`}
+              <ChevronRight className={`w-3.5 h-3.5 ml-1 transition-transform ${showAllActivity ? 'rotate-90' : ''}`} />
             </Button>
           </CardContent>
         </Card>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { mockParts } from '@/lib/mock-data';
+import { mockParts as initialParts } from '@/lib/mock-data';
 import { Part } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,15 +16,61 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Boxes, Plus, Search, MoreHorizontal, Eye, Edit, AlertTriangle, PackagePlus, ShoppingCart } from 'lucide-react';
 
 export default function PartsPage() {
+  const [parts, setParts] = useState<Part[]>(initialParts);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [stockFilter, setStockFilter] = useState('all');
   const [viewPart, setViewPart] = useState<Part | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({ name: '', partNumber: '', category: '', vendor: '', costPrice: '', unitPrice: '', stockQuantity: '', minStockLevel: '' });
 
-  const categories = [...new Set(mockParts.map(p => p.category))];
+  const handleAddPart = () => {
+    if (!addForm.name || !addForm.partNumber || !addForm.category) return;
+    const stockQuantity = Number(addForm.stockQuantity) || 0;
+    const minStockLevel = Number(addForm.minStockLevel) || 0;
+    const newPart: Part = {
+      _id: `part-${Date.now()}`,
+      partId: `GT-PART-${String(parts.length + 1).padStart(3, '0')}`,
+      name: addForm.name,
+      partNumber: addForm.partNumber,
+      category: addForm.category,
+      vendor: addForm.vendor || undefined,
+      costPrice: Number(addForm.costPrice) || 0,
+      unitPrice: Number(addForm.unitPrice) || 0,
+      stockQuantity,
+      minStockLevel,
+      maxStockLevel: Math.max(stockQuantity, minStockLevel * 4, 10),
+      reorderPoint: Math.max(minStockLevel, 1),
+      location: 'Main Store',
+      branch: 'Main Branch - Chennai',
+      unit: 'pcs',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setParts(prev => [newPart, ...prev]);
+    setAddForm({ name: '', partNumber: '', category: '', vendor: '', costPrice: '', unitPrice: '', stockQuantity: '', minStockLevel: '' });
+    setShowAddModal(false);
+  };
 
-  const filtered = mockParts.filter(p => {
+  const handleAddStock = (part: Part) => {
+    const input = prompt(`Add stock for ${part.name}. Enter quantity (${part.unit}):`, '10');
+    if (input === null) return;
+    const qty = parseInt(input, 10);
+    if (isNaN(qty) || qty <= 0) return;
+    setParts(prev => prev.map(p => p._id === part._id ? { ...p, stockQuantity: p.stockQuantity + qty, updatedAt: new Date().toISOString() } : p));
+    setViewPart(v => v && v._id === part._id ? { ...v, stockQuantity: v.stockQuantity + qty } : v);
+  };
+
+  const handleReorder = (part: Part) => {
+    if (confirm(`Reorder ${part.name}? Stock will be replenished from ${part.stockQuantity} to ${part.maxStockLevel} ${part.unit}.`)) {
+      setParts(prev => prev.map(p => p._id === part._id ? { ...p, stockQuantity: Math.max(p.stockQuantity, p.maxStockLevel), updatedAt: new Date().toISOString() } : p));
+      setViewPart(v => v && v._id === part._id ? { ...v, stockQuantity: Math.max(v.stockQuantity, v.maxStockLevel) } : v);
+    }
+  };
+
+  const categories = [...new Set(parts.map(p => p.category))];
+
+  const filtered = parts.filter(p => {
     const matchesSearch = !search ||
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.partId.toLowerCase().includes(search.toLowerCase()) ||
@@ -36,9 +82,9 @@ export default function PartsPage() {
     return matchesSearch && matchesCategory && matchesStock;
   });
 
-  const lowStockCount = mockParts.filter(p => p.stockQuantity <= p.minStockLevel).length;
-  const totalValue = mockParts.reduce((s, p) => s + (p.costPrice * p.stockQuantity), 0);
-  const totalRetailValue = mockParts.reduce((s, p) => s + (p.unitPrice * p.stockQuantity), 0);
+  const lowStockCount = parts.filter(p => p.stockQuantity <= p.minStockLevel).length;
+  const totalValue = parts.reduce((s, p) => s + (p.costPrice * p.stockQuantity), 0);
+  const totalRetailValue = parts.reduce((s, p) => s + (p.unitPrice * p.stockQuantity), 0);
 
   const getStockStatus = (part: Part) => {
     if (part.stockQuantity <= part.minStockLevel) return { label: 'Low Stock', className: 'bg-red-100 text-red-800 border-red-200' };
@@ -58,7 +104,7 @@ export default function PartsPage() {
               <Boxes className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{mockParts.length}</p>
+              <p className="text-2xl font-bold">{parts.length}</p>
               <p className="text-xs text-muted-foreground">Total Part Types</p>
             </div>
           </CardContent>
@@ -187,10 +233,10 @@ export default function PartsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => setViewPart(part)}><Eye className="w-3.5 h-3.5 mr-2" />View Details</DropdownMenuItem>
-                          <DropdownMenuItem><Edit className="w-3.5 h-3.5 mr-2" />Edit Part</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setViewPart(part)}><Edit className="w-3.5 h-3.5 mr-2" />Edit Part</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem><PackagePlus className="w-3.5 h-3.5 mr-2" />Add Stock</DropdownMenuItem>
-                          <DropdownMenuItem><ShoppingCart className="w-3.5 h-3.5 mr-2" />Reorder</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleAddStock(part)}><PackagePlus className="w-3.5 h-3.5 mr-2" />Add Stock</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleReorder(part)}><ShoppingCart className="w-3.5 h-3.5 mr-2" />Reorder</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -241,8 +287,8 @@ export default function PartsPage() {
                 </div>
               )}
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <Button variant="outline" className="flex-1"><Edit className="w-4 h-4 mr-2" />Edit</Button>
-                <Button className="flex-1 bg-primary text-white"><PackagePlus className="w-4 h-4 mr-2" />Add Stock</Button>
+                <Button variant="outline" className="flex-1" onClick={() => { setShowAddModal(true); setViewPart(null); }}><Edit className="w-4 h-4 mr-2" />Edit</Button>
+                <Button className="flex-1 bg-primary text-white" onClick={() => handleAddStock(viewPart)}><PackagePlus className="w-4 h-4 mr-2" />Add Stock</Button>
               </div>
             </>
           )}
@@ -257,7 +303,7 @@ export default function PartsPage() {
             <DialogDescription>Register a new spare part or consumable</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 mt-4">
-            {[
+            {([
               { id: 'name', label: 'Part Name *', placeholder: 'e.g. Engine Oil 5W-40' },
               { id: 'partNumber', label: 'Part Number *', placeholder: 'e.g. EO-5W40-1L' },
               { id: 'category', label: 'Category *', placeholder: 'e.g. Lubricants & Fluids' },
@@ -266,16 +312,22 @@ export default function PartsPage() {
               { id: 'unitPrice', label: 'Retail Price (₹) *', placeholder: '650' },
               { id: 'stockQuantity', label: 'Initial Stock *', placeholder: '20' },
               { id: 'minStockLevel', label: 'Min Stock Level *', placeholder: '5' },
-            ].map(({ id, label, placeholder }) => (
+            ] as { id: keyof typeof addForm; label: string; placeholder: string }[]).map(({ id, label, placeholder }) => (
               <div key={id} className="space-y-1.5">
                 <Label htmlFor={id} className="text-xs">{label}</Label>
-                <Input id={id} placeholder={placeholder} className="h-9" />
+                <Input
+                  id={id}
+                  placeholder={placeholder}
+                  className="h-9"
+                  value={addForm[id]}
+                  onChange={e => setAddForm(f => ({ ...f, [id]: e.target.value }))}
+                />
               </div>
             ))}
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" className="flex-1" onClick={() => setShowAddModal(false)}>Cancel</Button>
-            <Button className="flex-1 bg-primary text-white" onClick={() => setShowAddModal(false)}>Add Part</Button>
+            <Button className="flex-1 bg-primary text-white" onClick={handleAddPart}>Add Part</Button>
           </div>
         </DialogContent>
       </Dialog>

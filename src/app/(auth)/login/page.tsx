@@ -16,6 +16,17 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+
+  const handleForgotPassword = () => {
+    if (!email) {
+      setError('Enter your email above first, then click "Forgot password?".');
+      return;
+    }
+    setError('');
+    setResetSent(true);
+    setTimeout(() => setResetSent(false), 6000);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +78,13 @@ export default function LoginPage() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+            {resetSent && (
+              <Alert className="border-emerald-500/40 bg-emerald-50 text-emerald-800">
+                <AlertDescription>
+                  If an account exists for {email}, a password reset link has been sent.
+                </AlertDescription>
+              </Alert>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
@@ -87,7 +105,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <button type="button" className="text-xs text-primary hover:underline">
+                <button type="button" className="text-xs text-primary hover:underline" onClick={handleForgotPassword}>
                   Forgot password?
                 </button>
               </div>

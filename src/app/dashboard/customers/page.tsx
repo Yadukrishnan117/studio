@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { mockCustomers } from '@/lib/mock-data';
+import { mockCustomers as initialCustomers } from '@/lib/mock-data';
 import { Customer } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,11 +16,36 @@ import { Users, Plus, Search, MoreHorizontal, Eye, Edit, Phone, Mail, MapPin, St
 import { format } from 'date-fns';
 
 export default function CustomersPage() {
+  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
   const [search, setSearch] = useState('');
   const [viewCustomer, setViewCustomer] = useState<Customer | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({ firstName: '', lastName: '', email: '', phone: '', dob: '', occupation: '', address: '' });
 
-  const filtered = mockCustomers.filter(c => {
+  const handleAddCustomer = () => {
+    if (!addForm.firstName || !addForm.lastName || !addForm.phone) return;
+    const newCustomer: Customer = {
+      _id: `customer-${Date.now()}`,
+      customerId: `GT-CUST-${String(customers.length + 1).padStart(3, '0')}`,
+      firstName: addForm.firstName,
+      lastName: addForm.lastName,
+      email: addForm.email,
+      phone: addForm.phone,
+      dateOfBirth: addForm.dob || undefined,
+      occupation: addForm.occupation || undefined,
+      address: addForm.address ? { street: addForm.address, city: '', state: '', pincode: '', country: 'India' } : undefined,
+      loyaltyPoints: 0,
+      totalPurchases: 0,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setCustomers(prev => [newCustomer, ...prev]);
+    setAddForm({ firstName: '', lastName: '', email: '', phone: '', dob: '', occupation: '', address: '' });
+    setShowAddModal(false);
+  };
+
+  const filtered = customers.filter(c => {
     return !search ||
       `${c.firstName} ${c.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
       c.customerId.toLowerCase().includes(search.toLowerCase()) ||
@@ -28,16 +53,16 @@ export default function CustomersPage() {
       c.phone.includes(search);
   });
 
-  const totalRevenue = mockCustomers.reduce((s, c) => s + (c.totalPurchases || 0), 0);
+  const totalRevenue = customers.reduce((s, c) => s + (c.totalPurchases || 0), 0);
 
   return (
     <div className="space-y-6">
       {/* Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Customers', value: mockCustomers.length, color: 'bg-blue-500', icon: Users },
-          { label: 'Active Customers', value: mockCustomers.filter(c => c.isActive).length, color: 'bg-emerald-500', icon: Users },
-          { label: 'VIP Customers', value: mockCustomers.filter(c => (c.loyaltyPoints || 0) >= 5000).length, color: 'bg-amber-500', icon: Star },
+          { label: 'Total Customers', value: customers.length, color: 'bg-blue-500', icon: Users },
+          { label: 'Active Customers', value: customers.filter(c => c.isActive).length, color: 'bg-emerald-500', icon: Users },
+          { label: 'VIP Customers', value: customers.filter(c => (c.loyaltyPoints || 0) >= 5000).length, color: 'bg-amber-500', icon: Star },
           { label: 'Total Revenue', value: `₹${(totalRevenue / 10000000).toFixed(2)}Cr`, color: 'bg-orange-500', icon: Car },
         ].map(({ label, value, color, icon: Icon }) => (
           <Card key={label} className="gati-card">
@@ -130,8 +155,8 @@ export default function CustomersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setViewCustomer(customer)}><Eye className="w-3.5 h-3.5 mr-2" />View Profile</DropdownMenuItem>
-                        <DropdownMenuItem><Edit className="w-3.5 h-3.5 mr-2" />Edit Customer</DropdownMenuItem>
-                        <DropdownMenuItem><Car className="w-3.5 h-3.5 mr-2" />Vehicle History</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setViewCustomer(customer)}><Edit className="w-3.5 h-3.5 mr-2" />Edit Customer</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.location.href = '/dashboard/vehicles'}><Car className="w-3.5 h-3.5 mr-2" />Vehicle History</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -197,8 +222,8 @@ export default function CustomersPage() {
                 </div>
               )}
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <Button variant="outline" className="flex-1"><Edit className="w-4 h-4 mr-2" />Edit</Button>
-                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"><Car className="w-4 h-4 mr-2" />View Vehicles</Button>
+                <Button variant="outline" className="flex-1" onClick={() => { setShowAddModal(true); setViewCustomer(null); }}><Edit className="w-4 h-4 mr-2" />Edit</Button>
+                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white" onClick={() => { setViewCustomer(null); window.location.href = '/dashboard/vehicles'; }}><Car className="w-4 h-4 mr-2" />View Vehicles</Button>
               </div>
             </>
           )}
@@ -213,27 +238,39 @@ export default function CustomersPage() {
             <DialogDescription>Create a new customer profile</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 mt-4">
-            {[
+            {([
               { id: 'firstName', label: 'First Name *', placeholder: 'First name' },
               { id: 'lastName', label: 'Last Name *', placeholder: 'Last name' },
               { id: 'email', label: 'Email *', placeholder: 'email@example.com' },
               { id: 'phone', label: 'Phone *', placeholder: '+91-XXXXX-XXXXX' },
               { id: 'dob', label: 'Date of Birth', placeholder: '', type: 'date' },
               { id: 'occupation', label: 'Occupation', placeholder: 'e.g. Engineer' },
-            ].map(({ id, label, placeholder, type }) => (
+            ] as { id: keyof typeof addForm; label: string; placeholder: string; type?: string }[]).map(({ id, label, placeholder, type }) => (
               <div key={id} className="space-y-1.5">
                 <Label htmlFor={id} className="text-xs">{label}</Label>
-                <Input id={id} type={type || 'text'} placeholder={placeholder} className="h-9" />
+                <Input
+                  id={id}
+                  type={type || 'text'}
+                  placeholder={placeholder}
+                  className="h-9"
+                  value={addForm[id]}
+                  onChange={e => setAddForm(f => ({ ...f, [id]: e.target.value }))}
+                />
               </div>
             ))}
           </div>
           <div className="space-y-1.5 mt-2">
             <Label className="text-xs">Address</Label>
-            <Textarea placeholder="Full address..." className="h-20 resize-none" />
+            <Textarea
+              placeholder="Full address..."
+              className="h-20 resize-none"
+              value={addForm.address}
+              onChange={e => setAddForm(f => ({ ...f, address: e.target.value }))}
+            />
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" className="flex-1" onClick={() => setShowAddModal(false)}>Cancel</Button>
-            <Button className="flex-1 bg-primary text-white" onClick={() => setShowAddModal(false)}>Add Customer</Button>
+            <Button className="flex-1 bg-primary text-white" onClick={handleAddCustomer}>Add Customer</Button>
           </div>
         </DialogContent>
       </Dialog>

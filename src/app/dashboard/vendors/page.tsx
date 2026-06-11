@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { mockVendors } from '@/lib/mock-data';
+import { mockVendors as initialVendors } from '@/lib/mock-data';
 import { Vendor } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,12 +23,35 @@ const TYPE_CONFIG: Record<string, { label: string; className: string }> = {
 };
 
 export default function VendorsPage() {
+  const [vendors, setVendors] = useState<Vendor[]>(initialVendors);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [viewVendor, setViewVendor] = useState<Vendor | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({ name: '', phone: '', email: '', gst: '', pan: '', terms: '', type: '', address: '' });
 
-  const filtered = mockVendors.filter(v => {
+  const handleAddVendor = () => {
+    if (!addForm.name || !addForm.phone || !addForm.type) return;
+    const newVendor: Vendor = {
+      _id: `vendor-${Date.now()}`,
+      vendorId: `GT-VND-${String(vendors.length + 1).padStart(3, '0')}`,
+      name: addForm.name,
+      type: addForm.type as Vendor['type'],
+      contactInfo: { phone: addForm.phone, email: addForm.email },
+      address: { street: addForm.address, city: '', state: '', pincode: '', country: 'India' },
+      gstNumber: addForm.gst || undefined,
+      panNumber: addForm.pan || undefined,
+      paymentTerms: addForm.terms || undefined,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setVendors(prev => [newVendor, ...prev]);
+    setAddForm({ name: '', phone: '', email: '', gst: '', pan: '', terms: '', type: '', address: '' });
+    setShowAddModal(false);
+  };
+
+  const filtered = vendors.filter(v => {
     const matchesSearch = !search ||
       v.name.toLowerCase().includes(search.toLowerCase()) ||
       v.vendorId.toLowerCase().includes(search.toLowerCase());
@@ -46,10 +69,10 @@ export default function VendorsPage() {
       {/* Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Vendors', value: mockVendors.length, color: 'bg-blue-500', icon: Building2 },
-          { label: 'Active Vendors', value: mockVendors.filter(v => v.isActive).length, color: 'bg-emerald-500', icon: Building2 },
-          { label: 'Parts Suppliers', value: mockVendors.filter(v => v.type === 'parts_supplier').length, color: 'bg-orange-500', icon: Package },
-          { label: 'Equipment Suppliers', value: mockVendors.filter(v => v.type === 'equipment_supplier').length, color: 'bg-purple-500', icon: Package },
+          { label: 'Total Vendors', value: vendors.length, color: 'bg-blue-500', icon: Building2 },
+          { label: 'Active Vendors', value: vendors.filter(v => v.isActive).length, color: 'bg-emerald-500', icon: Building2 },
+          { label: 'Parts Suppliers', value: vendors.filter(v => v.type === 'parts_supplier').length, color: 'bg-orange-500', icon: Package },
+          { label: 'Equipment Suppliers', value: vendors.filter(v => v.type === 'equipment_supplier').length, color: 'bg-purple-500', icon: Package },
         ].map(({ label, value, color, icon: Icon }) => (
           <Card key={label} className="gati-card">
             <CardContent className="p-4 flex items-center gap-3">
@@ -111,7 +134,7 @@ export default function VendorsPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => setViewVendor(vendor)}><Eye className="w-3.5 h-3.5 mr-2" />View Details</DropdownMenuItem>
-                      <DropdownMenuItem><Edit className="w-3.5 h-3.5 mr-2" />Edit Vendor</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setViewVendor(vendor)}><Edit className="w-3.5 h-3.5 mr-2" />Edit Vendor</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -192,8 +215,8 @@ export default function VendorsPage() {
                 </div>
               )}
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <Button variant="outline" className="flex-1"><Edit className="w-4 h-4 mr-2" />Edit Vendor</Button>
-                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"><Package className="w-4 h-4 mr-2" />Create PO</Button>
+                <Button variant="outline" className="flex-1" onClick={() => { setShowAddModal(true); setViewVendor(null); }}><Edit className="w-4 h-4 mr-2" />Edit Vendor</Button>
+                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white" onClick={() => { setViewVendor(null); window.location.href = '/dashboard/parts'; }}><Package className="w-4 h-4 mr-2" />Create PO</Button>
               </div>
             </>
           )}
@@ -208,23 +231,29 @@ export default function VendorsPage() {
             <DialogDescription>Register a new vendor or supplier</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 mt-4">
-            {[
+            {([
               { id: 'name', label: 'Vendor Name *', placeholder: 'Company name' },
               { id: 'phone', label: 'Phone *', placeholder: '+91-XXXXX-XXXXX' },
               { id: 'email', label: 'Email *', placeholder: 'contact@vendor.com' },
               { id: 'gst', label: 'GST Number', placeholder: 'GSTIN' },
               { id: 'pan', label: 'PAN Number', placeholder: 'PANNO' },
               { id: 'terms', label: 'Payment Terms', placeholder: 'e.g. Net 30' },
-            ].map(({ id, label, placeholder }) => (
+            ] as { id: keyof typeof addForm; label: string; placeholder: string }[]).map(({ id, label, placeholder }) => (
               <div key={id} className="space-y-1.5">
                 <Label htmlFor={id} className="text-xs">{label}</Label>
-                <Input id={id} placeholder={placeholder} className="h-9" />
+                <Input
+                  id={id}
+                  placeholder={placeholder}
+                  className="h-9"
+                  value={addForm[id]}
+                  onChange={e => setAddForm(f => ({ ...f, [id]: e.target.value }))}
+                />
               </div>
             ))}
           </div>
           <div className="space-y-1.5 mt-2">
             <Label className="text-xs">Type *</Label>
-            <Select>
+            <Select value={addForm.type} onValueChange={v => setAddForm(f => ({ ...f, type: v }))}>
               <SelectTrigger><SelectValue placeholder="Select vendor type" /></SelectTrigger>
               <SelectContent>
                 {Object.entries(TYPE_CONFIG).map(([v, c]) => <SelectItem key={v} value={v}>{c.label}</SelectItem>)}
@@ -233,11 +262,16 @@ export default function VendorsPage() {
           </div>
           <div className="space-y-1.5 mt-2">
             <Label className="text-xs">Address</Label>
-            <Textarea placeholder="Full address..." className="h-20 resize-none" />
+            <Textarea
+              placeholder="Full address..."
+              className="h-20 resize-none"
+              value={addForm.address}
+              onChange={e => setAddForm(f => ({ ...f, address: e.target.value }))}
+            />
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" className="flex-1" onClick={() => setShowAddModal(false)}>Cancel</Button>
-            <Button className="flex-1 bg-primary text-white" onClick={() => setShowAddModal(false)}>Add Vendor</Button>
+            <Button className="flex-1 bg-primary text-white" onClick={handleAddVendor}>Add Vendor</Button>
           </div>
         </DialogContent>
       </Dialog>

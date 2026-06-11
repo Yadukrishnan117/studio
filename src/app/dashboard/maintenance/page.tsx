@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { mockMaintenance } from '@/lib/mock-data';
+import { mockMaintenance as initialMaintenance } from '@/lib/mock-data';
 import { MaintenanceRecord } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -39,13 +39,50 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export default function MaintenancePage() {
+  const [records, setRecords] = useState<MaintenanceRecord[]>(initialMaintenance);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [viewRecord, setViewRecord] = useState<MaintenanceRecord | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({ assetName: '', type: '', priority: '', scheduledDate: '', estimatedDuration: '', estimatedCost: '', assignedTechnician: '', description: '', notes: '' });
 
-  const filtered = mockMaintenance.filter(m => {
+  const handleAddRecord = () => {
+    if (!addForm.assetName || !addForm.description) return;
+    const newRecord: MaintenanceRecord = {
+      _id: `maint-${Date.now()}`,
+      workOrderId: `GT-WO-${String(records.length + 1).padStart(3, '0')}`,
+      assetName: addForm.assetName,
+      type: (addForm.type || 'preventive') as MaintenanceRecord['type'],
+      status: 'scheduled',
+      priority: (addForm.priority || 'medium') as MaintenanceRecord['priority'],
+      description: addForm.description,
+      scheduledDate: addForm.scheduledDate ? new Date(addForm.scheduledDate).toISOString() : new Date().toISOString(),
+      estimatedDuration: Number(addForm.estimatedDuration) || 0,
+      estimatedCost: Number(addForm.estimatedCost) || 0,
+      assignedTechnician: addForm.assignedTechnician || undefined,
+      notes: addForm.notes || undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setRecords(prev => [newRecord, ...prev]);
+    setAddForm({ assetName: '', type: '', priority: '', scheduledDate: '', estimatedDuration: '', estimatedCost: '', assignedTechnician: '', description: '', notes: '' });
+    setShowAddModal(false);
+  };
+
+  const handleUpdateStatus = (id: string, status: MaintenanceRecord['status']) => {
+    setRecords(prev => prev.map(r => r._id === id
+      ? {
+          ...r,
+          status,
+          ...(status === 'in_progress' && !r.startDate ? { startDate: new Date().toISOString() } : {}),
+          ...(status === 'completed' ? { completedDate: new Date().toISOString() } : {}),
+          updatedAt: new Date().toISOString(),
+        }
+      : r));
+  };
+
+  const filtered = records.filter(m => {
     const matchesSearch = !search ||
       m.assetName.toLowerCase().includes(search.toLowerCase()) ||
       m.workOrderId.toLowerCase().includes(search.toLowerCase());
@@ -54,7 +91,7 @@ export default function MaintenancePage() {
     return matchesSearch && matchesStatus && matchesPriority;
   });
 
-  const counts = mockMaintenance.reduce((acc, m) => {
+  const counts = records.reduce((acc, m) => {
     acc[m.status] = (acc[m.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -193,10 +230,10 @@ export default function MaintenancePage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => setViewRecord(record)}><Eye className="w-3.5 h-3.5 mr-2" />View Details</DropdownMenuItem>
-                          <DropdownMenuItem><Edit className="w-3.5 h-3.5 mr-2" />Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setViewRecord(record)}><Edit className="w-3.5 h-3.5 mr-2" />Edit</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem><CheckCircle2 className="w-3.5 h-3.5 mr-2" />Mark Completed</DropdownMenuItem>
-                          <DropdownMenuItem><AlertTriangle className="w-3.5 h-3.5 mr-2" />Mark In Progress</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleUpdateStatus(record._id, 'completed')}><CheckCircle2 className="w-3.5 h-3.5 mr-2" />Mark Completed</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleUpdateStatus(record._id, 'in_progress')}><AlertTriangle className="w-3.5 h-3.5 mr-2" />Mark In Progress</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -269,8 +306,8 @@ export default function MaintenancePage() {
                 </div>
               )}
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <Button variant="outline" className="flex-1"><Edit className="w-4 h-4 mr-2" />Edit Work Order</Button>
-                <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"><CheckCircle2 className="w-4 h-4 mr-2" />Mark Complete</Button>
+                <Button variant="outline" className="flex-1" onClick={() => { setShowAddModal(true); setViewRecord(null); }}><Edit className="w-4 h-4 mr-2" />Edit Work Order</Button>
+                <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => { handleUpdateStatus(viewRecord._id, 'completed'); setViewRecord(null); }}><CheckCircle2 className="w-4 h-4 mr-2" />Mark Complete</Button>
               </div>
             </>
           )}
@@ -287,12 +324,12 @@ export default function MaintenancePage() {
           <div className="space-y-4 mt-4">
             <div className="space-y-1.5">
               <Label className="text-xs">Asset / Vehicle Name *</Label>
-              <Input placeholder="e.g. Vehicle Lift Bay 1" className="h-9" />
+              <Input placeholder="e.g. Vehicle Lift Bay 1" className="h-9" value={addForm.assetName} onChange={e => setAddForm(f => ({ ...f, assetName: e.target.value }))} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs">Maintenance Type *</Label>
-                <Select>
+                <Select value={addForm.type} onValueChange={v => setAddForm(f => ({ ...f, type: v }))}>
                   <SelectTrigger className="h-9"><SelectValue placeholder="Select type" /></SelectTrigger>
                   <SelectContent>
                     {Object.entries(TYPE_LABELS).map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}
@@ -301,7 +338,7 @@ export default function MaintenancePage() {
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">Priority *</Label>
-                <Select>
+                <Select value={addForm.priority} onValueChange={v => setAddForm(f => ({ ...f, priority: v }))}>
                   <SelectTrigger className="h-9"><SelectValue placeholder="Select priority" /></SelectTrigger>
                   <SelectContent>
                     {Object.entries(PRIORITY_CONFIG).map(([v, c]) => <SelectItem key={v} value={v}>{c.label}</SelectItem>)}
@@ -312,35 +349,35 @@ export default function MaintenancePage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs">Scheduled Date *</Label>
-                <Input type="date" className="h-9" />
+                <Input type="date" className="h-9" value={addForm.scheduledDate} onChange={e => setAddForm(f => ({ ...f, scheduledDate: e.target.value }))} />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">Estimated Duration (hours) *</Label>
-                <Input type="number" placeholder="4" className="h-9" />
+                <Input type="number" placeholder="4" className="h-9" value={addForm.estimatedDuration} onChange={e => setAddForm(f => ({ ...f, estimatedDuration: e.target.value }))} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs">Estimated Cost (₹) *</Label>
-                <Input type="number" placeholder="10000" className="h-9" />
+                <Input type="number" placeholder="10000" className="h-9" value={addForm.estimatedCost} onChange={e => setAddForm(f => ({ ...f, estimatedCost: e.target.value }))} />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">Assigned Technician</Label>
-                <Input placeholder="e.g. Ramesh Babu" className="h-9" />
+                <Input placeholder="e.g. Ramesh Babu" className="h-9" value={addForm.assignedTechnician} onChange={e => setAddForm(f => ({ ...f, assignedTechnician: e.target.value }))} />
               </div>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">Description *</Label>
-              <Textarea placeholder="Describe the maintenance work to be done..." className="h-24 resize-none" />
+              <Textarea placeholder="Describe the maintenance work to be done..." className="h-24 resize-none" value={addForm.description} onChange={e => setAddForm(f => ({ ...f, description: e.target.value }))} />
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">Notes</Label>
-              <Textarea placeholder="Additional notes or instructions..." className="h-16 resize-none" />
+              <Textarea placeholder="Additional notes or instructions..." className="h-16 resize-none" value={addForm.notes} onChange={e => setAddForm(f => ({ ...f, notes: e.target.value }))} />
             </div>
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" className="flex-1" onClick={() => setShowAddModal(false)}>Cancel</Button>
-            <Button className="flex-1 bg-primary text-white" onClick={() => setShowAddModal(false)}>Create Work Order</Button>
+            <Button className="flex-1 bg-primary text-white" onClick={handleAddRecord}>Create Work Order</Button>
           </div>
         </DialogContent>
       </Dialog>
