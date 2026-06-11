@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import { Settings, Building2, Users, Bell, Shield, Database, Plus, Edit, Trash2, CheckCircle2, Save } from 'lucide-react';
+import { Settings, Building2, Users, Bell, Shield, Database, Plus, Edit, Trash2, CheckCircle2, Save, CreditCard } from 'lucide-react';
+import Link from 'next/link';
+import { PLANS, type PlanId } from '@/lib/plans';
 
 const mockUsers = [
   { id: 'u1', name: 'Admin User', email: 'admin@gatitech.in', role: 'super_admin', branch: 'All Branches', isActive: true, lastLogin: '2024-06-09' },
@@ -31,6 +33,171 @@ const ROLE_CONFIG: Record<string, { label: string; className: string }> = {
   sales: { label: 'Sales', className: 'bg-emerald-100 text-emerald-800' },
   viewer: { label: 'Viewer', className: 'bg-gray-100 text-gray-700' },
 };
+
+const MOCK_INVOICES = [
+  { id: 'INV-2026-004', date: 'Jun 10, 2026', amount: '₹2,999', status: 'Paid' },
+  { id: 'INV-2026-003', date: 'May 10, 2026', amount: '₹2,999', status: 'Paid' },
+  { id: 'INV-2026-002', date: 'Apr 10, 2026', amount: '₹2,999', status: 'Paid' },
+];
+
+function SubscriptionTab() {
+  const [planId, setPlanId] = useState<PlanId>('starter');
+  const [userName, setUserName] = useState('Admin User');
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('gati_auth');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.plan && parsed.plan in PLANS) setPlanId(parsed.plan as PlanId);
+        if (parsed.name) setUserName(parsed.name);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const plan = PLANS[planId];
+
+  const usageData = [
+    {
+      label: 'Assets',
+      used: 12,
+      limit: plan.limits.assets,
+    },
+    {
+      label: 'Users',
+      used: 2,
+      limit: plan.limits.users,
+    },
+    {
+      label: 'Branches',
+      used: 1,
+      limit: plan.limits.branches,
+    },
+  ];
+
+  const planColorClass: Record<PlanId, string> = {
+    starter: 'bg-emerald-100 text-emerald-800',
+    pro: 'bg-orange-100 text-orange-800',
+    enterprise: 'bg-violet-100 text-violet-800',
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Current Plan Card */}
+      <Card className="gati-card">
+        <CardHeader className="flex flex-row items-start justify-between pb-3">
+          <div>
+            <CardTitle className="text-base">Current Plan</CardTitle>
+            <CardDescription>Your active subscription details</CardDescription>
+          </div>
+          <Badge className={`text-xs ${planColorClass[planId]}`}>
+            {plan.name}
+          </Badge>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-end gap-3">
+            <span className="text-3xl font-bold">{plan.priceLabel}</span>
+            {plan.price > 0 && (
+              <span className="text-sm text-muted-foreground mb-1">Renews July 10, 2026</span>
+            )}
+            {plan.price === 0 && (
+              <span className="text-sm text-muted-foreground mb-1">Free forever</span>
+            )}
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {plan.features.map((f) => (
+              <div key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                {f}
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button asChild className="bg-primary text-white gap-2">
+              <Link href="/pricing"><CreditCard className="w-4 h-4" />Upgrade Plan</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Usage Meters */}
+      <Card className="gati-card">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Usage</CardTitle>
+          <CardDescription>Resources used this billing period</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {usageData.map(({ label, used, limit }) => {
+            const isUnlimited = !isFinite(limit);
+            const pct = isUnlimited ? 0 : Math.min(100, Math.round((used / limit) * 100));
+            return (
+              <div key={label} className="space-y-1.5">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium">{label}</span>
+                  <span className="text-muted-foreground">
+                    {used} / {isUnlimited ? '∞' : limit}
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${pct >= 90 ? 'bg-red-500' : 'bg-primary'}`}
+                    style={{ width: isUnlimited ? '0%' : `${pct}%` }}
+                  />
+                </div>
+                {!isUnlimited && (
+                  <p className="text-xs text-muted-foreground">{pct}% used</p>
+                )}
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      {/* Billing History */}
+      <Card className="gati-card overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Billing History</CardTitle>
+          <CardDescription>Past invoices and payments</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/30">
+                <TableHead className="text-xs font-semibold pl-6">Invoice</TableHead>
+                <TableHead className="text-xs font-semibold">Date</TableHead>
+                <TableHead className="text-xs font-semibold">Amount</TableHead>
+                <TableHead className="text-xs font-semibold">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {MOCK_INVOICES.map((inv) => (
+                <TableRow key={inv.id} className="hover:bg-muted/20">
+                  <TableCell className="pl-6 text-sm font-medium">{inv.id}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{inv.date}</TableCell>
+                  <TableCell className="text-sm font-medium">{inv.amount}</TableCell>
+                  <TableCell>
+                    <Badge className="bg-emerald-100 text-emerald-800 text-xs">{inv.status}</Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Danger Zone */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className="text-sm text-red-500 hover:text-red-600 underline underline-offset-2 transition-colors"
+          onClick={() => alert('To cancel your subscription, please contact support@gatitech.in')}
+        >
+          Cancel Subscription
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
@@ -52,6 +219,7 @@ export default function SettingsPage() {
           <TabsTrigger value="notifications" className="gap-2"><Bell className="w-4 h-4" />Notifications</TabsTrigger>
           <TabsTrigger value="security" className="gap-2"><Shield className="w-4 h-4" />Security</TabsTrigger>
           <TabsTrigger value="system" className="gap-2"><Database className="w-4 h-4" />System</TabsTrigger>
+          <TabsTrigger value="subscription" className="gap-2"><CreditCard className="w-4 h-4" />Subscription</TabsTrigger>
         </TabsList>
 
         {/* Company Settings */}
@@ -379,6 +547,11 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Subscription */}
+        <TabsContent value="subscription" className="mt-6">
+          <SubscriptionTab />
         </TabsContent>
       </Tabs>
     </div>

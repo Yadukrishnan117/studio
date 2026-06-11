@@ -22,14 +22,20 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      setLoading(false);
+      return;
+    }
+
     // Simulate auth - in production this would call NextAuth
     await new Promise(resolve => setTimeout(resolve, 1200));
 
-    if (email && password) {
+    if (email === 'admin@gatitech.in' && password === 'admin123') {
       localStorage.setItem('gati_auth', JSON.stringify({ email, role: 'admin', ts: Date.now() }));
       router.push('/dashboard');
     } else {
-      setError('Please enter valid credentials');
+      setError('Invalid email or password. Please try again.');
       setLoading(false);
     }
   };
@@ -121,12 +127,6 @@ export default function LoginPage() {
               )}
             </Button>
 
-            {/* Demo Credentials */}
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-              <p className="text-xs font-medium text-blue-700 mb-1">Demo Credentials</p>
-              <p className="text-xs text-blue-600">Email: admin@gatitech.in</p>
-              <p className="text-xs text-blue-600">Password: any password works</p>
-            </div>
           </form>
         </CardContent>
       </Card>
