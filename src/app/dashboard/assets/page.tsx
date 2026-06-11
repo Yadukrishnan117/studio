@@ -46,7 +46,7 @@ export default function AssetsPage() {
   const handleAddAsset = () => {
     if (!addForm.name || !addForm.category || !addForm.branch) return;
     const newAsset: Asset = {
-      id: `asset-${Date.now()}`,
+      _id: `asset-${Date.now()}`,
       assetId: `GT-ASSET-${String(assets.length + 1).padStart(3, '0')}`,
       name: addForm.name,
       category: addForm.category as Asset['category'],
@@ -70,7 +70,7 @@ export default function AssetsPage() {
 
   const handleDeleteAsset = (id: string) => {
     if (confirm('Are you sure you want to delete this asset?')) {
-      setAssets(prev => prev.filter(a => a.id !== id));
+      setAssets(prev => prev.filter(a => a._id !== id));
     }
   };
 
@@ -88,7 +88,7 @@ export default function AssetsPage() {
   const totalCost = filtered.reduce((s, a) => s + a.purchasePrice, 0);
   const depreciation = totalCost - totalValue;
 
-  const statusCounts = mockAssets.reduce((acc, a) => {
+  const statusCounts = assets.reduce((acc, a) => {
     acc[a.status] = (acc[a.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -115,7 +115,7 @@ export default function AssetsPage() {
               <Package className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{mockAssets.length}</p>
+              <p className="text-2xl font-bold">{assets.length}</p>
               <p className="text-xs text-muted-foreground">Total Assets</p>
             </div>
           </CardContent>
@@ -272,7 +272,7 @@ export default function AssetsPage() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => window.location.href = '/dashboard/maintenance'}><Wrench className="w-3.5 h-3.5 mr-2" />Create Work Order</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteAsset(asset.id)}><Trash2 className="w-3.5 h-3.5 mr-2" />Delete</DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteAsset(asset._id)}><Trash2 className="w-3.5 h-3.5 mr-2" />Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

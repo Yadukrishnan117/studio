@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { mockVehicles } from '@/lib/mock-data';
+import { mockVehicles as initialVehicles } from '@/lib/mock-data';
 import { Vehicle } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -48,14 +48,57 @@ const PDI_CONFIG: Record<string, { icon: React.ComponentType<any>; className: st
 };
 
 export default function VehiclesPage() {
+  const [vehicles, setVehicles] = useState<Vehicle[]>(initialVehicles);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [fuelFilter, setFuelFilter] = useState('all');
   const [branchFilter, setBranchFilter] = useState('all');
   const [viewVehicle, setViewVehicle] = useState<Vehicle | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({ make: '', model: '', variant: '', vin: '', year: '', color: '', costPrice: '', sellingPrice: '', fuelType: '', transmission: '', branch: '', features: '' });
 
-  const filtered = mockVehicles.filter(v => {
+  const handleAddVehicle = () => {
+    if (!addForm.make || !addForm.model) return;
+    const newVehicle: Vehicle = {
+      _id: `veh-${Date.now()}`,
+      vehicleId: `GT-VEH-${String(vehicles.length + 1).padStart(3, '0')}`,
+      vin: addForm.vin || `VIN-${Date.now()}`,
+      make: addForm.make,
+      model: addForm.model,
+      variant: addForm.variant,
+      year: Number(addForm.year) || new Date().getFullYear(),
+      color: addForm.color,
+      type: 'car',
+      fuelType: (addForm.fuelType || 'petrol') as Vehicle['fuelType'],
+      transmission: (addForm.transmission || 'manual') as Vehicle['transmission'],
+      status: 'available',
+      condition: 'new',
+      costPrice: Number(addForm.costPrice) || 0,
+      sellingPrice: Number(addForm.sellingPrice) || 0,
+      location: addForm.branch || 'Main Branch - Chennai',
+      branch: addForm.branch || 'Main Branch - Chennai',
+      stockDate: new Date().toISOString(),
+      pdiStatus: 'pending',
+      features: addForm.features ? addForm.features.split(',').map(f => f.trim()).filter(Boolean) : [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setVehicles(prev => [newVehicle, ...prev]);
+    setAddForm({ make: '', model: '', variant: '', vin: '', year: '', color: '', costPrice: '', sellingPrice: '', fuelType: '', transmission: '', branch: '', features: '' });
+    setShowAddModal(false);
+  };
+
+  const handleUpdateStatus = (id: string, status: Vehicle['status']) => {
+    setVehicles(prev => prev.map(v => v._id === id ? { ...v, status, updatedAt: new Date().toISOString() } : v));
+  };
+
+  const handleDeleteVehicle = (id: string) => {
+    if (confirm('Are you sure you want to delete this vehicle?')) {
+      setVehicles(prev => prev.filter(v => v._id !== id));
+    }
+  };
+
+  const filtered = vehicles.filter(v => {
     const matchesSearch = !search ||
       v.make.toLowerCase().includes(search.toLowerCase()) ||
       v.model.toLowerCase().includes(search.toLowerCase()) ||
@@ -68,7 +111,7 @@ export default function VehiclesPage() {
     return matchesSearch && matchesStatus && matchesFuel && matchesBranch;
   });
 
-  const statusCounts = mockVehicles.reduce((acc, v) => {
+  const statusCounts = vehicles.reduce((acc, v) => {
     acc[v.status] = (acc[v.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -139,7 +182,7 @@ export default function VehiclesPage() {
           <div className="flex items-center justify-between mt-3 pt-3 border-t">
             <p className="text-sm text-muted-foreground">
               Showing <span className="font-medium text-foreground">{filtered.length}</span> of{' '}
-              <span className="font-medium text-foreground">{mockVehicles.length}</span> vehicles
+              <span className="font-medium text-foreground">{vehicles.length}</span> vehicles
             </p>
             <p className="text-sm text-muted-foreground">
               Total Value:{' '}
@@ -218,15 +261,15 @@ export default function VehiclesPage() {
                           <DropdownMenuItem onClick={() => setViewVehicle(vehicle)}>
                             <Eye className="w-3.5 h-3.5 mr-2" /> View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setViewVehicle(vehicle)}>
                             <Edit className="w-3.5 h-3.5 mr-2" /> Edit Vehicle
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>Mark as Reserved</DropdownMenuItem>
-                          <DropdownMenuItem>Mark as Sold</DropdownMenuItem>
-                          <DropdownMenuItem>Create Work Order</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleUpdateStatus(vehicle._id, 'reserved')}>Mark as Reserved</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleUpdateStatus(vehicle._id, 'sold')}>Mark as Sold</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.location.href = '/dashboard/maintenance'}>Create Work Order</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600">
+                          <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteVehicle(vehicle._id)}>
                             <Trash2 className="w-3.5 h-3.5 mr-2" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -295,10 +338,10 @@ export default function VehiclesPage() {
               )}
 
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <Button className="flex-1" variant="outline">
+                <Button className="flex-1" variant="outline" onClick={() => { setShowAddModal(true); setViewVehicle(null); }}>
                   <Edit className="w-4 h-4 mr-2" /> Edit Vehicle
                 </Button>
-                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
+                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white" onClick={() => { setViewVehicle(null); window.location.href = '/dashboard/maintenance'; }}>
                   <Plus className="w-4 h-4 mr-2" /> Create Work Order
                 </Button>
               </div>
@@ -315,7 +358,7 @@ export default function VehiclesPage() {
             <DialogDescription>Enter vehicle details to add to inventory</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 mt-4">
-            {[
+            {([
               { id: 'make', label: 'Make *', placeholder: 'e.g. Maruti Suzuki' },
               { id: 'model', label: 'Model *', placeholder: 'e.g. Swift' },
               { id: 'variant', label: 'Variant *', placeholder: 'e.g. ZXi Plus' },
@@ -324,17 +367,23 @@ export default function VehiclesPage() {
               { id: 'color', label: 'Color *', placeholder: 'e.g. Pearl White' },
               { id: 'costPrice', label: 'Cost Price (₹) *', placeholder: '800000' },
               { id: 'sellingPrice', label: 'Selling Price (₹) *', placeholder: '860000' },
-            ].map(({ id, label, placeholder }) => (
+            ] as { id: keyof typeof addForm; label: string; placeholder: string }[]).map(({ id, label, placeholder }) => (
               <div key={id} className="space-y-1.5">
                 <Label htmlFor={id} className="text-xs">{label}</Label>
-                <Input id={id} placeholder={placeholder} className="h-9" />
+                <Input
+                  id={id}
+                  placeholder={placeholder}
+                  className="h-9"
+                  value={addForm[id]}
+                  onChange={e => setAddForm(f => ({ ...f, [id]: e.target.value }))}
+                />
               </div>
             ))}
           </div>
           <div className="grid grid-cols-2 gap-4 mt-2">
             <div className="space-y-1.5">
               <Label className="text-xs">Fuel Type *</Label>
-              <Select>
+              <Select value={addForm.fuelType} onValueChange={v => setAddForm(f => ({ ...f, fuelType: v }))}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="Select fuel type" />
                 </SelectTrigger>
@@ -347,7 +396,7 @@ export default function VehiclesPage() {
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">Transmission *</Label>
-              <Select>
+              <Select value={addForm.transmission} onValueChange={v => setAddForm(f => ({ ...f, transmission: v }))}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="Select transmission" />
                 </SelectTrigger>
@@ -361,24 +410,29 @@ export default function VehiclesPage() {
           </div>
           <div className="space-y-1.5 mt-2">
             <Label className="text-xs">Branch *</Label>
-            <Select>
+            <Select value={addForm.branch} onValueChange={v => setAddForm(f => ({ ...f, branch: v }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Select branch" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="main">Main Branch - Chennai</SelectItem>
-                <SelectItem value="annanagar">Anna Nagar Branch</SelectItem>
-                <SelectItem value="omr">OMR Branch</SelectItem>
+                <SelectItem value="Main Branch - Chennai">Main Branch - Chennai</SelectItem>
+                <SelectItem value="Anna Nagar Branch">Anna Nagar Branch</SelectItem>
+                <SelectItem value="OMR Branch">OMR Branch</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-1.5 mt-2">
             <Label className="text-xs">Features (comma-separated)</Label>
-            <Textarea placeholder="Sunroof, CarPlay, Reverse Camera..." className="h-20 resize-none" />
+            <Textarea
+              placeholder="Sunroof, CarPlay, Reverse Camera..."
+              className="h-20 resize-none"
+              value={addForm.features}
+              onChange={e => setAddForm(f => ({ ...f, features: e.target.value }))}
+            />
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" className="flex-1" onClick={() => setShowAddModal(false)}>Cancel</Button>
-            <Button className="flex-1 bg-primary text-white" onClick={() => setShowAddModal(false)}>Add Vehicle</Button>
+            <Button className="flex-1 bg-primary text-white" onClick={handleAddVehicle}>Add Vehicle</Button>
           </div>
         </DialogContent>
       </Dialog>
