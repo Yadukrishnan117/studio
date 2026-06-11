@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FileText, Download, BarChart2, Car, Package, Wrench, Users, Building2, IndianRupee, Calendar, Clock, CheckCircle2, Loader2 } from 'lucide-react';
+import { mockAssets, mockVehicles, mockMaintenance, mockParts, mockVendors, mockCustomers, salesTrendData } from '@/lib/mock-data';
 
 const REPORT_TYPES = [
   {
@@ -109,9 +110,78 @@ export default function ReportsPage() {
   const [branch, setBranch] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
+  const buildReportRows = (reportId: string): (string | number)[][] => {
+    switch (reportId) {
+      case 'asset_register':
+        return [
+          ['Asset ID', 'Name', 'Category', 'Status', 'Branch', 'Purchase Price (INR)', 'Current Value (INR)', 'Depreciation Rate %'],
+          ...mockAssets.map(a => [a.assetId, a.name, a.category, a.status, a.branch, a.purchasePrice, a.currentValue, a.depreciationRate]),
+        ];
+      case 'vehicle_inventory':
+        return [
+          ['Vehicle ID', 'Make', 'Model', 'Year', 'Status', 'Branch', 'Cost Price (INR)', 'Selling Price (INR)', 'PDI Status'],
+          ...mockVehicles.map(v => [v.vehicleId, v.make, v.model, v.year, v.status, v.branch, v.costPrice, v.sellingPrice, v.pdiStatus ?? '-']),
+        ];
+      case 'maintenance_summary':
+        return [
+          ['Work Order', 'Asset', 'Type', 'Status', 'Priority', 'Scheduled Date', 'Technician', 'Estimated Cost (INR)'],
+          ...mockMaintenance.map(m => [m.workOrderId, m.assetName, m.type, m.status, m.priority, m.scheduledDate, m.assignedTechnician ?? '-', m.estimatedCost ?? 0]),
+        ];
+      case 'depreciation_schedule':
+        return [
+          ['Asset ID', 'Name', 'Purchase Price (INR)', 'Current Value (INR)', 'Depreciation (INR)', 'Annual Rate %'],
+          ...mockAssets.map(a => [a.assetId, a.name, a.purchasePrice, a.currentValue, a.purchasePrice - a.currentValue, a.depreciationRate]),
+        ];
+      case 'sales_performance':
+        return [
+          ['Month', 'Units Sold', 'Target', 'Revenue (INR)'],
+          ...salesTrendData.map(d => [d.month, d.units, d.target, d.revenue]),
+        ];
+      case 'customer_analysis':
+        return [
+          ['Customer ID', 'Name', 'Email', 'Phone', 'Loyalty Points', 'Total Purchases (INR)', 'Last Visit'],
+          ...mockCustomers.map(c => [c.customerId, `${c.firstName} ${c.lastName}`, c.email ?? '-', c.phone, c.loyaltyPoints ?? 0, c.totalPurchases ?? 0, c.lastVisit ?? '-']),
+        ];
+      case 'vendor_performance':
+        return [
+          ['Vendor ID', 'Name', 'Type', 'Rating', 'Payment Terms', 'Active'],
+          ...mockVendors.map(v => [v.vendorId, v.name, v.type, v.rating ?? '-', v.paymentTerms ?? '-', v.isActive ? 'Yes' : 'No']),
+        ];
+      case 'parts_inventory':
+        return [
+          ['Part ID', 'Name', 'Part Number', 'Category', 'Vendor', 'Stock Qty', 'Min Level', 'Unit Price (INR)'],
+          ...mockParts.map(p => [p.partId, p.name, p.partNumber, p.category, p.vendor ?? '-', p.stockQuantity, p.minStockLevel, p.unitPrice]),
+        ];
+      case 'warranty_expiry':
+        return [
+          ['Asset ID', 'Name', 'Category', 'Warranty Expiry', 'Insurance Expiry'],
+          ...mockAssets.map(a => [a.assetId, a.name, a.category, a.warrantyExpiry ?? '-', a.insuranceExpiry ?? '-']),
+        ];
+      default:
+        return [['No data available']];
+    }
+  };
+
   const handleGenerate = async (reportId: string) => {
     setGenerating(reportId);
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 1200));
+    const report = REPORT_TYPES.find(r => r.id === reportId);
+    const meta: (string | number)[][] = [
+      [report?.title ?? reportId],
+      [`Date Range: ${dateFrom} to ${dateTo}`],
+      [`Branch: ${branch === 'all' ? 'All Branches' : branch}`],
+      [],
+    ];
+    const csv = [...meta, ...buildReportRows(reportId)]
+      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${reportId}_${dateFrom}_to_${dateTo}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
     setGenerating(null);
   };
 

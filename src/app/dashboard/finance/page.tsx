@@ -46,6 +46,25 @@ export default function FinancePage() {
   const totalVehicleValue = mockVehicles.filter(v => v.status !== 'sold').reduce((s, v) => s + v.sellingPrice, 0);
   const totalDepreciation = mockAssets.reduce((s, a) => s + (a.purchasePrice - a.currentValue), 0);
 
+  const handleExport = () => {
+    const header = ['Asset ID', 'Asset Name', 'Purchase Price (INR)', 'Current Value (INR)', 'Depreciation (INR)', 'Depreciation %', 'Annual Rate %'];
+    const rows = mockAssets.map(asset => {
+      const dep = asset.purchasePrice - asset.currentValue;
+      const depPct = Math.round((dep / asset.purchasePrice) * 100);
+      return [asset.assetId, asset.name, asset.purchasePrice, asset.currentValue, dep, depPct, asset.depreciationRate];
+    });
+    const csv = [header, ...rows]
+      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'asset-depreciation-schedule.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       {/* Financial KPIs */}
@@ -194,7 +213,7 @@ export default function FinancePage() {
             <CardTitle className="text-base">Asset Depreciation Schedule</CardTitle>
             <CardDescription>Current value vs purchase price for top assets</CardDescription>
           </div>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
             <Download className="w-4 h-4" /> Export
           </Button>
         </CardHeader>
